@@ -1,0 +1,15 @@
+.div-salvar{
+  position: fixed;
+  bottom: 3px;
+}
+.mens{
+  position: fixed;
+  top: 65px;
+  width: 80%;
+  z-index: 1;
+  right: 10px;
+  text-align: left;
+}
+.event-edit{
+  cursor: pointer;
+}
