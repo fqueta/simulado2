@@ -55,14 +55,15 @@ class Qlib
 		}
 		return $ret;
 	}
-	public function lib_array_json($json=''){
+	public static function lib_array_json($json=''){
 		$ret = false;
 		if(is_array($json)){
 			$ret = json_encode($json,JSON_UNESCAPED_UNICODE);
 		}
 		return $ret;
 	}
-  static function isJson($string) {
+
+    static function isJson($string) {
 		$ret=false;
 		if (is_object(json_decode($string)) || is_array(json_decode($string)))
 		{
@@ -110,5 +111,65 @@ class Qlib
 
 			}
 			return $ret;
+	}
+    static function qForm($config=false){
+        if(isset($config['type'])){
+            $config['campo'] = isset($config['campo'])?$config['campo']:'teste';
+            $config['label'] = isset($config['label'])?$config['label']:false;
+            $config['placeholder'] = isset($config['placeholder'])?$config['placeholder']:false;
+            $config['selected'] = isset($config['selected']) ? $config['selected']:false;
+            $config['tam'] = isset($config['tam']) ? $config['tam']:'12';
+            $config['col'] = isset($config['col']) ? $config['col']:'md';
+            $config['event'] = isset($config['event']) ? $config['event']:false;
+            $config['ac'] = isset($config['ac']) ? $config['ac']:'cad';
+            $config['option_select'] = isset($config['option_select']) ? $config['option_select']:true;
+            $config['label_option_select'] = isset($config['label_option_select']) ? $config['label_option_select']:'Selecione';
+            $config['option_gerente'] = isset($config['option_gerente']) ? $config['option_gerente']:false;
+            $config['class'] = isset($config['class']) ? $config['class'] : false;
+            $config['style'] = isset($config['style']) ? $config['style'] : false;
+            $config['class_div'] = isset($config['class_div']) ? $config['class_div'] : false;
+
+            return view('qlib.campos_form',['config'=>$config]);
+        }else{
+            return false;
+        }
+    }
+    static function sql_array($sql, $ind, $ind_2, $ind_3 = '', $leg = '',$type=false){
+        $table = DB::select($sql);
+        $userinfo = array();
+        if($table){
+            //dd($table);
+            for($i = 0;$i < count($table);$i++){
+                $table[$i] = (array)$table[$i];
+                if($ind_3 == ''){
+                    $userinfo[$table[$i][$ind_2]] =  $table[$i][$ind];
+                }elseif(is_array($ind_3) && isset($ind_3['tab'])){
+                    /*É sinal que o valor vira de banco de dados*/
+                    $sql = "SELECT ".$ind_3['campo_enc']." FROM `".$ind_3['tab']."` WHERE ".$ind_3['campo_bus']." = '".$table[$i][$ind_2]."'";
+                    $userinfo[$table[$i][$ind_2]] = $sql;
+                }else{
+                    if($type){
+                        if($type == 'data'){
+                            /*Tipo de campo exibe*/
+                            $userinfo[$table[$i][$ind_2]] = $table[$i][$ind] . '' . $leg . '' . Qlib::dataExibe($table[$i][$ind_3]);
+                        }
+                    }else{
+                        $userinfo[$table[$i][$ind_2]] = $table[$i][$ind] . '' . $leg . '' . $table[$i][$ind_3];
+                    }
+                }
+            }
+        }
+
+        return $userinfo;
+    }
+    static function formatMensagem($config=false){
+        if($config){
+            $config['mens'] = isset($config['mens']) ? $config['mens'] : false;
+            $config['color'] = isset($config['color']) ? $config['color'] : false;
+            $config['time'] = isset($config['time']) ? $config['time'] : 4000;
+            return view('qlib.format_mensagem', ['config'=>$config]);
+        }else{
+            return false;
+        }
 	}
 }

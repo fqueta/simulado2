@@ -5,7 +5,7 @@ use App\Rules\FullName;
 use App\Rules\RightCpf;
 use Illuminate\Foundation\Http\FormRequest;
 
-class StorePostRequest extends FormRequest
+class StoreFamilyRequest extends FormRequest
 {
     public function authorize()
     {
@@ -14,9 +14,15 @@ class StorePostRequest extends FormRequest
     public function rules()
     {
         return [
-            'nome_completo'=>['required',new FullName],
-            'tel'=>'required',
-            'cpf'=>['required','unique:familias',new RightCpf],
+            'area_alvo'=>['required'],
+            'loteamento'=>['required'],
+            'matricula'=>['required'],
+            'quadra'=>['required'],
+            'lote'=>['required'],
+            'nome_completo'=>[new FullName],
+            'escolaridade'=>'required',
+            'estado_civil'=>'required',
+            'cpf'=>[new RightCpf],
         ];
     }
     public function messages()

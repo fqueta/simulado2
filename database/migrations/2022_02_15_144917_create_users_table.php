@@ -21,7 +21,7 @@ class CreateUsersTable extends Migration
             $table->string('password');
             $table->enum('status',['actived','inactived','pre_registred']);
             $table->enum('gender',['male','female']);
-            $table->enum('profile',['administrator','user']);
+            $table->enum('profile',['dev','admin','user']);
             $table->rememberToken();
             $table->timestamps();
         });

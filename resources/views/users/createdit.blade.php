@@ -14,7 +14,7 @@
       <div class="form-group col-md-12">
         <label for="role">Tipo de usuário</label>
         <select class="form-control" name="profile">
-          <option @if(isset($users['profile'])&&$users['profile']=='administrator') selected @endif value="administrator">Adminstrador</option>
+          <option @if(isset($users['profile'])&&$users['profile']=='admin') selected @endif value="admin">Adminstrador</option>
           <option @if(isset($users['profile'])&&$users['profile']=='user') selected @endif value="user">Usuário</option>
         </select>
       </div>

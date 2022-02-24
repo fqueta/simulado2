@@ -39,6 +39,8 @@ class RightCpf implements Rule
      }
 
      public function validateCpf($cpf){
+         if(empty($cpf))
+            return true;
          $cpf = preg_replace( '/[^0-9]/is', '', $cpf );
          if (strlen($cpf) != 11) {
              return false;

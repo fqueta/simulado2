@@ -6,7 +6,38 @@
     <h3>{{$titulo}}</h3>
 @stop
 @section('content')
-@include('familias.frm')
+<div class="row">
+    <div class="col-md-8">
+        <div class="card card-primary">
+            <div class="card-header">
+                <h3 class="card-title">Informações</h3>
+                <div class="card-tools">
+                    <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+                      <i class="fas fa-minus"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                @include('familias.frm')
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Arquivos</h3>
+                <div class="card-tools">
+                    <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+                      <i class="fas fa-minus"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+
+            </div>
+        </div>
+    </div>
+</div>
 
 @stop
 
@@ -15,12 +46,15 @@
 @stop
 
 @section('js')
+    <script src="{{url('/')}}/js/jquery.inputmask.bundle.min.js"></script>
     <script src=" {{url('/')}}/js/lib.js"></script>
     <script type="text/javascript">
           $(function(){
             $('a.print-card').on('click',function(e){
                 openPageLink(e,$(this).attr('href'),"{{date('Y')}}");
             });
+            $('#cpf,#cpf_conjuge').inputmask('999.999.999-99');
           });
+
     </script>
 @stop

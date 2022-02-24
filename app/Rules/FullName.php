@@ -25,7 +25,10 @@ class FullName implements Rule
      */
     public function passes($attribute, $value)
     {
-        return str_word_count($value) > 1;
+        if(!empty($value))
+            return str_word_count($value) > 1;
+        else
+            return true;
     }
 
     /**

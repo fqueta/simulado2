@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Qlib\Qlib;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class TesteController extends Controller
 {
@@ -13,7 +15,12 @@ class TesteController extends Controller
      */
     public function index()
     {
-        echo __FILE__;
+        //Auth::logout();
+        //echo __FILE__;
+       // $dados = Auth::check();
+        //$dados = Qlib::sql_array("SELECT id,nome FROM escolaridades ORDER BY nome ", 'nome', 'id');
+        //dd($dados);
+        return view('teste');
     }
 
     /**
