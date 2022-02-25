@@ -532,3 +532,97 @@ function clientes_mascaraTelefone(v) {
 	  }
 	  return r;
 }
+function confirmDelete(obj){
+    var id = obj.data('id');
+    if(window.confirm('DESEJA MESMO EXCLUIR?')){
+         $('#frm-'+id).submit();
+    }
+        //alert('modal agora');
+}
+function urlAtual(){
+    return window.location.href;
+}
+function isEmpty(str) {
+    return (!str || 0 === str.length);
+}
+function __translate(val,val2){
+      return val;
+}
+function lib_trataAddUrl(campo,valor,urlinic){
+	var ret = '';
+	if(typeof urlinic == 'undefined')
+		var urla = urlAtual();
+	else
+		var urla = urlinic;
+	var urlAtua = urla.split('?');
+	if(typeof urlAtua[1]=='undefined'){
+		urlAtua[1] = '';
+	}
+	var urlA1 = urlAtua[1];
+	var opc = 1;
+	urlA1 = urlA1.replace('&=','',urlAtua[1]);
+	if(opc==1){
+			ret += urlAtua[0]+'?';
+			var arr_url = urlAtua[opc];
+			arr_url = arr_url.split('&');
+			var mudou = false;
+			arr_url.forEach(function (element, index) {
+				//console.log("[" + index + "] = " + element);
+				var arr_vu = element.split('=');
+				if(!isEmpty(arr_vu[0])){
+					if(arr_vu[0]==campo){
+						mudou = true;
+						ret += arr_vu[0] +'='+valor+'&';
+					}else{
+						ret += arr_vu[0] +'='+arr_vu[1]+'&';
+					}
+				}
+
+			});
+			if(!mudou){
+				ret += '&'+campo+'='+valor;
+			}
+			ret = ret.replace('&&','&');
+			ret = ret.replace('?&','?');
+			ret = ret.replace('/?','?');
+	}
+	console.log(ret);
+	return ret;
+}
+function lib_trataRemoveUrl(campo,valor,urlinic){
+	var ret = '';
+   if(typeof urlinic == 'undefined')
+		var urla = urlAtual();
+	else
+		var urla = urlinic;
+	var urlAtua = urla.split('?');
+	var urlA1 = urlAtua[1];
+	var opc = 1;
+	urlA1 = urlA1.replace('&=','',urlAtua[1]);
+	if(opc==1){
+			ret += urlAtua[0]+'?';
+			var arr_url = urlAtua[opc];
+			arr_url = arr_url.split('&');
+			var mudou = false;
+			arr_url.forEach(function (element, index) {
+				//console.log("[" + index + "] = " + element);
+				var arr_vu = element.split('=');
+				if(!isEmpty(arr_vu[0])){
+					if(arr_vu[0]==campo){
+						mudou = true;
+						//ret += arr_vu[0] +'='+valor+'&';
+					}else{
+						ret += arr_vu[0] +'='+arr_vu[1]+'&';
+					}
+				}
+
+			});
+			if(!mudou){
+				ret += '&'+campo+'='+valor;
+			}
+			ret = ret.replace('&&','&');
+			//alert('&&','&');
+			//console.log(urlAtua[1]);
+	}
+	return ret;
+}

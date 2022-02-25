@@ -16,6 +16,11 @@ use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
+use App\Exports\UsersExport;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\FamiliasExport;
+use App\Exports\FamiliasExportView;
+
 
 use DataTables;
 use Illuminate\Support\Facades\Auth;
@@ -28,72 +33,106 @@ class FamiliaController extends Controller
         $this->middleware('auth');
         $this->user = $user;
     }
+    public function queryFamilias($get=false,$config=false)
+    {
+        $ret = false;
+        $get = isset($_GET) ? $_GET:[];
+        $ano = date('Y');
+        $mes = date('m');
+        //$todasFamilias = Familia::where('excluido','=','n')->where('deletado','=','n');
+        $config = [
+            'limit'=>isset($get['limit']) ? $get['limit']: 50,
+            'order'=>isset($get['order']) ? $get['order']: 'desc',
+        ];
 
+        $familia =  Familia::where('excluido','=','n')->where('deletado','=','n')->orderBy('id',$config['order']);
+        $familia_totais = new stdClass;
+        $campos = isset($_SESSION['campos_familias_exibe']) ? $_SESSION['campos_familias_exibe'] : $this->campos();
+        $tituloTabela = 'Lista de todos cadastros';
+        $arr_titulo = false;
+        if(isset($get['filter'])){
+                $titulo_tab = false;
+                $i = 0;
+                foreach ($get['filter'] as $key => $value) {
+                    if(!empty($value)){
+                        if($key=='id'){
+                            $familia->where($key,'LIKE', $value);
+                            $titulo_tab .= 'Todos com *'. $campos[$key]['label'] .'% = '.$value.'& ';
+                            $arr_titulo[$campos[$key]['label']] = $value;
+                        }else{
+                            $familia->where($key,'LIKE','%'. $value. '%');
+                            if($campos[$key]['type']=='select'){
+                                $value = $campos[$key]['arr_opc'][$value];
+                            }
+                            $arr_titulo[$campos[$key]['label']] = $value;
+                            $titulo_tab .= 'Todos com *'. $campos[$key]['label'] .'% = '.$value.'& ';
+                        }
+                        $i++;
+                    }
+                }
+                if($titulo_tab){
+                    $tituloTabela = 'Lista de: &'.$titulo_tab;
+                                //$arr_titulo = explode('&',$tituloTabela);
+                }
+                $familia_totais->todos = $familia->get()->count();
+                $familia_totais->esteMes = $familia->whereYear('created_at', '=', $ano)->whereMonth('created_at','=',$mes)->count();
+                $familia_totais->idoso = $familia->where('idoso','=','s')->count();
+                $familia_totais->criancas = $familia->where('crianca_adolescente','=','s')->count();
+                if($config['limit']=='todos'){
+                    $familia = $familia->get();
+                }else{
+                    $familia = $familia->paginate($config['limit']);
+                }
+        }else{
+               $familia_totais->todos = $familia->get()->count();
+               $familia_totais->esteMes = $familia->whereYear('created_at', '=', $ano)->whereMonth('created_at','=',$mes)->count();
+                $familia_totais->idoso = $familia->where('idoso','=','s')->count();
+                $familia_totais->criancas = $familia->where('crianca_adolescente','=','s')->count();
+                if($config['limit']=='todos'){
+                    $familia = $familia->get();
+                }else{
+                    $familia = $familia->paginate($config['limit']);
+                }
+        }
+        $ret['familia'] = $familia;
+        $ret['familia_totais'] = $familia_totais;
+        $ret['arr_titulo'] = $arr_titulo;
+        $ret['campos'] = $campos;
+        $ret['config'] = $config;
+        $ret['tituloTabela'] = $tituloTabela;
+        return $ret;
+    }
     public function index(User $user)
     {
         $this->authorize('is_admin', $user);
         $title = 'Famílias Cadastradas';
         $titulo = $title;
-        $ano = date('Y');
-        $mes = date('m');
-        //$todasFamilias = Familia::where('excluido','=','n')->where('deletado','=','n');
-        $familia =  Familia::where('excluido','=','n')->where('deletado','=','n');
-        $familia_totais = new stdClass;
-        $campos = isset($_SESSION['campos_familias_exibe']) ? $_SESSION['campos_familias_exibe'] : $this->campos();
-        $tituloTabela = 'Lista de todos cadastros';
-        $arr_titulo = false;
-        $config = [
-            'limit'=>isset($_GET['limit']) ? $_GET['limit']: 50,
-        ];
-        if(isset($_GET['filter'])){
-            $titulo_tab = false;
-            $i = 0;
-            foreach ($_GET['filter'] as $key => $value) {
-                if(!empty($value)){
-                    if($key=='id'){
-                        $familia->where($key,'LIKE', $value);
-                        $titulo_tab .= 'Todos com *'. $campos[$key]['label'] .'% = '.$value.'& ';
-                        $arr_titulo[$campos[$key]['label']] = $value;
-                    }else{
-                        $familia->where($key,'LIKE','%'. $value. '%');
-                        if($campos[$key]['type']=='select'){
-                            $value = $campos[$key]['arr_opc'][$value];
-                        }
-                        $arr_titulo[$campos[$key]['label']] = $value;
-                        $titulo_tab .= 'Todos com *'. $campos[$key]['label'] .'% = '.$value.'& ';
-                    }
-                    $i++;
-                }
-            }
-            if($titulo_tab){
-                $tituloTabela = 'Lista de: &'.$titulo_tab;
-                //$arr_titulo = explode('&',$tituloTabela);
-            }
-            $familia_totais->todos = $familia->get()->count();
-            $familia_totais->esteMes = $familia->whereYear('created_at', '=', $ano)->whereMonth('created_at','=',$mes)->count();
-            $familia_totais->idoso = $familia->where('idoso','=','s')->count();
-            $familia_totais->criancas = $familia->where('crianca_adolescente','=','s')->count();
-            $familia = $familia->paginate($config['limit']);
-        }else{
-            $familia_totais->todos = $familia->get()->count();
-            $familia_totais->esteMes = $familia->whereYear('created_at', '=', $ano)->whereMonth('created_at','=',$mes)->count();
-            $familia_totais->idoso = $familia->where('idoso','=','s')->count();
-            $familia_totais->criancas = $familia->where('crianca_adolescente','=','s')->count();
-            $familia = $familia->paginate($config['limit']);
-        }
-
+        $queryFamilias = $this->queryFamilias($_GET);
+        $queryFamilias['config']['exibe'] = 'html';
 
         return view('familias.index',[
-            'familias'=>$familia,
+            'familias'=>$queryFamilias['familia'],
             'title'=>$title,
             'titulo'=>$titulo,
-            'campos_tabela'=>$campos,
-            'familia_totais'=>$familia_totais,
-            'titulo_tabela'=>$tituloTabela,
-            'arr_titulo'=>$arr_titulo,
-            'config'=>$config,
+            'campos_tabela'=>$queryFamilias['campos'],
+            'familia_totais'=>$queryFamilias['familia_totais'],
+            'titulo_tabela'=>$queryFamilias['tituloTabela'],
+            'arr_titulo'=>$queryFamilias['arr_titulo'],
+            'config'=>$queryFamilias['config'],
             'i'=>0,
         ]);
+    }
+    public function exportAll(User $user)
+    {
+        $this->authorize('is_admin', $user);
+        return Excel::download(new FamiliasExport, 'Familias_'.date('d_m_Y').'.xlsx');
+    }
+    public function exportFilter(User $user)
+    {
+        $this->authorize('is_admin', $user);
+        $dados = new FamiliasExportView;
+        //return $dados->view();
+        return Excel::download(new FamiliasExportView, 'Familias_'.date('d_m_Y').'.xlsx');
     }
     public function campos(){
         return [
@@ -159,7 +198,7 @@ class FamiliaController extends Controller
         $dados['token'] = uniqid();
         //dd($dados);
         $salvar = Familia::create($dados);
-        return redirect()->route('familias.index')->with('message','Cadastro realizado com sucesso');
+        return redirect()->route('familias.index',['mens'=>'Salvo com sucesso!','color'=>'success']);
     }
 
     public function show(Familia $familia)
@@ -236,12 +275,12 @@ class FamiliaController extends Controller
     public function destroy($id)
     {
         if (!$post = Familia::find($id))
-            return redirect()->route('familias.index');
+            return redirect()->route('familias.index',['mens'=>'Registro não encontrado!','color'=>'danger']);
 
         //if (Storage::exists($post->image))
             //Storage::delete($post->image);
 
         Familia::where('id',$id)->delete();
-            return redirect()->route('familias.index');
+            return redirect()->route('familias.index',['mens'=>'Registro deletado com sucesso!','color'=>'success']);
     }
 }

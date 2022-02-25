@@ -54,6 +54,8 @@
                     <div class="col-md-12">
                         <div class="btn-group">
                             <button class="btn btn-primary" type="submit"> <i class="fas fa-search"></i> Localizar</button>
+                            <a href=" {{route('familias.index')}} " class="btn btn-default" title="Limpar Filtros" type="button"> <i class="fas fa-times"></i> Limpar</a>
+                            @include('familias.dropdow_actions')
                         </div>
                     </div>
                 </div>

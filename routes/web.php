@@ -7,6 +7,7 @@ use App\Http\Controllers\GerenciarUsuarios;
 use App\Http\Controllers\GerenciarRelatorios;
 use App\Http\Controllers\FamiliaController;
 use App\Http\Controllers\TesteController;
+use Illuminate\Support\Facades\Auth;
 
 /*
 |--------------------------------------------------------------------------
@@ -49,6 +50,8 @@ Route::prefix('familias')->group(function(){
     Route::put('/{id}',[FamiliaController::class,'update'])->where('id', '[0-9]+')->name('familias.update');
     Route::post('/{id}',[FamiliaController::class,'update'])->where('id', '[0-9]+')->name('familias.update-ajax');
     Route::delete('/{id}',[FamiliaController::class,'destroy'])->where('id', '[0-9]+')->name('familias.destroy');
+    Route::get('export/all', [FamiliaController::class, 'exportAll'])->name('familias.export_all');
+    Route::get('export/filter', [FamiliaController::class, 'exportFilter'])->name('familias.export_filter');
 });
 
 Route::fallback(function () {
