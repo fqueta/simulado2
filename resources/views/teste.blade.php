@@ -11,8 +11,7 @@
 
     <link rel="stylesheet" href="{{url('/')}}/css/dropzone.min.css" type="text/css" />
 
-    <form action="/file-upload"
-        class="dropzone"
+    <form action="{{}}" class=""
         id="my-drop">
     </form>
 
@@ -32,7 +31,7 @@
     <script>
         // The dropzone method is added to jQuery elements and can
     // be invoked with an (optional) configuration object.
-    carregaDropZone('#my-drop');
+    //carregaDropZone('#my-drop');
 
     </script>
 

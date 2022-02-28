@@ -42,6 +42,7 @@ class UploadController extends Controller
     {
         $file = $request->file('file');
         $filenameWithExt = $file->getClientOriginalName();
+        dd($file);
         // Get just filename
         $filename = pathinfo($filenameWithExt, PATHINFO_FILENAME);
         // Get just ext
