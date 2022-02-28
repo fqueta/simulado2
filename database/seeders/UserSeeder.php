@@ -15,12 +15,24 @@ class UserSeeder extends Seeder
      */
     public function run()
     {
-        User::create([
-            'name' => 'Fernando Queta',
-            'email' => 'fernando@maisaqui.com.br',
-            'password' => Hash::make('ferqueta'),
-            'status' => 'actived',
-            'profile' => 'dev',
-        ]);
+        $arr = [
+            [
+                'name' => 'Fernando Queta',
+                'email' => 'fernando@maisaqui.com.br',
+                'password' => Hash::make('ferqueta'),
+                'status' => 'actived',
+                'profile' => 'dev',
+            ],
+            [
+                'name' => 'Usuario de teste',
+                'email' => 'teste@databrasil.app.br',
+                'password' => Hash::make('mudar123'),
+                'status' => 'actived',
+                'profile' => 'admin',
+            ]
+        ];
+        foreach ($arr as $key => $value) {
+            User::create($value);
+        }
     }
 }
