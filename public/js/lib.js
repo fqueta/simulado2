@@ -724,3 +724,6 @@ function excluirArquivo(id,ajaxurl){
         }
     });
 }
+function carregaDropZone(seletor){
+    $(seletor).dropzone({ url: "/file/post" });
+}
