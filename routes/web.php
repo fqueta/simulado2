@@ -7,6 +7,7 @@ use App\Http\Controllers\GerenciarUsuarios;
 use App\Http\Controllers\GerenciarRelatorios;
 use App\Http\Controllers\FamiliaController;
 use App\Http\Controllers\TesteController;
+use App\Http\Controllers\UploadController;
 use Illuminate\Support\Facades\Auth;
 
 /*
@@ -52,6 +53,25 @@ Route::prefix('familias')->group(function(){
     Route::delete('/{id}',[FamiliaController::class,'destroy'])->where('id', '[0-9]+')->name('familias.destroy');
     Route::get('export/all', [FamiliaController::class, 'exportAll'])->name('familias.export_all');
     Route::get('export/filter', [FamiliaController::class, 'exportFilter'])->name('familias.export_filter');
+});
+
+Route::prefix('uploads')->group(function(){
+    Route::get('/',[uploadController::class,'index'])->name('uploads.index');
+
+    Route::get('/ajax',[uploadController::class,'paginacaoAjax'])->name('uploads.ajax');
+    Route::get('/lista.ajax',function(){
+        return view('users.index_ajax');
+    });
+
+    Route::get('/create',[UploadController::class,'create'])->name('uploads.create');
+    Route::post('/',[UploadController::class,'store'])->name('uploads.store');
+    Route::get('/{id}/show',[UploadController::class,'show'])->name('uploads.show');
+    Route::get('/{id}/edit',[UploadController::class,'edit'])->name('uploads.edit');
+    Route::put('/{id}',[UploadController::class,'update'])->where('id', '[0-9]+')->name('uploads.update');
+    Route::post('/{id}',[UploadController::class,'update'])->where('id', '[0-9]+')->name('uploads.update-ajax');
+    Route::post('/{id}',[UploadController::class,'destroy'])->where('id', '[0-9]+')->name('uploads.destroy');
+    Route::get('export/all', [UploadController::class, 'exportAll'])->name('uploads.export_all');
+    Route::get('export/filter', [UploadController::class, 'exportFilter'])->name('uploads.export_filter');
 });
 
 Route::fallback(function () {

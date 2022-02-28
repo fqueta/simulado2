@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Familia;
 use App\Models\User;
+use App\Models\_upload;
 use App\Rules\FullName;
 use App\Rules\RightCpf;
 
@@ -46,6 +47,8 @@ class FamiliaController extends Controller
         ];
 
         $familia =  Familia::where('excluido','=','n')->where('deletado','=','n')->orderBy('id',$config['order']);
+        //$familia =  DB::table('familias')->where('excluido','=','n')->where('deletado','=','n')->orderBy('id',$config['order']);
+
         $familia_totais = new stdClass;
         $campos = isset($_SESSION['campos_familias_exibe']) ? $_SESSION['campos_familias_exibe'] : $this->campos();
         $tituloTabela = 'Lista de todos cadastros';
@@ -74,25 +77,28 @@ class FamiliaController extends Controller
                     $tituloTabela = 'Lista de: &'.$titulo_tab;
                                 //$arr_titulo = explode('&',$tituloTabela);
                 }
-                $familia_totais->todos = $familia->get()->count();
-                $familia_totais->esteMes = $familia->whereYear('created_at', '=', $ano)->whereMonth('created_at','=',$mes)->count();
-                $familia_totais->idoso = $familia->where('idoso','=','s')->count();
-                $familia_totais->criancas = $familia->where('crianca_adolescente','=','s')->count();
+                $fm = $familia;
                 if($config['limit']=='todos'){
                     $familia = $familia->get();
                 }else{
                     $familia = $familia->paginate($config['limit']);
                 }
+                $familia_totais->todos = $fm->count();
+                $familia_totais->esteMes = $fm->whereYear('created_at', '=', $ano)->whereMonth('created_at','=',$mes)->count();
+                $familia_totais->idoso = $fm->where('idoso','=','s')->count();
+                $familia_totais->criancas = $fm->where('crianca_adolescente','=','s')->count();
+
         }else{
-               $familia_totais->todos = $familia->get()->count();
-               $familia_totais->esteMes = $familia->whereYear('created_at', '=', $ano)->whereMonth('created_at','=',$mes)->count();
-                $familia_totais->idoso = $familia->where('idoso','=','s')->count();
-                $familia_totais->criancas = $familia->where('crianca_adolescente','=','s')->count();
-                if($config['limit']=='todos'){
-                    $familia = $familia->get();
-                }else{
-                    $familia = $familia->paginate($config['limit']);
-                }
+            $fm = $familia;
+            if($config['limit']=='todos'){
+                $familia = $familia->get();
+            }else{
+                $familia = $familia->paginate($config['limit']);
+            }
+            $familia_totais->todos = $fm->count();
+            $familia_totais->esteMes = $fm->whereYear('created_at', '=', $ano)->whereMonth('created_at','=',$mes)->count();
+            $familia_totais->idoso = $fm->where('idoso','=','s')->count();
+            $familia_totais->criancas = $fm->where('crianca_adolescente','=','s')->count();
         }
         $ret['familia'] = $familia;
         $ret['familia_totais'] = $familia_totais;
@@ -100,6 +106,7 @@ class FamiliaController extends Controller
         $ret['campos'] = $campos;
         $ret['config'] = $config;
         $ret['tituloTabela'] = $tituloTabela;
+
         return $ret;
     }
     public function index(User $user)
@@ -167,7 +174,7 @@ class FamiliaController extends Controller
         //$Users = Users::all();
         $arr_user = ['ac'=>'cad'];
         //$roles = DB::select("SELECT * FROM roles ORDER BY id ASC");
-        $familia = ['ac'=>'cad'];
+        $familia = ['ac'=>'cad','token'=>uniqid()];
         $arr_escolaridade = $dados = Qlib::sql_array("SELECT id,nome FROM escolaridades ORDER BY nome ", 'nome', 'id');
         $arr_estadocivil = $dados = Qlib::sql_array("SELECT id,nome FROM estadocivils ORDER BY nome ", 'nome', 'id');
         return view('familias.createedit',[
@@ -222,12 +229,18 @@ class FamiliaController extends Controller
             }
             $arr_escolaridade = Qlib::sql_array("SELECT id,nome FROM escolaridades ORDER BY nome ", 'nome', 'id');
             $arr_estadocivil = Qlib::sql_array("SELECT id,nome FROM estadocivils ORDER BY nome ", 'nome', 'id');
+            $listFiles = false;
+            if(isset($dados[0]['token'])){
+                $listFiles = _upload::where('token_produto','=',$dados[0]['token'])->get();
+            }
+
             return view('familias.createedit',[
                 'familia'=>$dados[0],
                 'title'=>$title,
                 'titulo'=>$titulo,
                 'arr_escolaridade'=>$arr_escolaridade,
                 'arr_estadocivil'=>$arr_estadocivil,
+                'listFiles'=>$listFiles,
             ]);
         }else{
           return redirect()->route('familias.index');

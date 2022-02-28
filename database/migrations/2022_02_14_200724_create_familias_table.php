@@ -36,7 +36,7 @@ class CreateFamiliasTable extends Migration
             $table->enum('crianca_adolescente',['s','n']);
             $table->string('bcp_bolsa_familia','100')->nullable();
             $table->double('renda_familiar',12,2)->nullable();
-            $table->string('doc_imovel','100')->nullable();
+            $table->text('doc_imovel')->nullable();
             $table->string('endereco','250')->nullable();
             $table->string('numero','100')->nullable();
             $table->string('bairro','200')->nullable();

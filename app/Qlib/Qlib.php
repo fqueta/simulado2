@@ -172,4 +172,42 @@ class Qlib
             return false;
         }
 	}
+    static function gerUploadAquivos($config=false){
+        if($config){
+            $config['parte'] = isset($config['parte']) ? $config['parte'] : 'painel';
+            $config['token_produto'] = isset($config['token_produto']) ? $config['token_produto'] : false;
+            $config['listFiles'] = isset($config['listFiles']) ? $config['listFiles'] : false; // array com a lista
+            $config['time'] = isset($config['time']) ? $config['time'] : 4000;
+            if($config['listFiles']){
+                $tipo = false;
+                foreach ($config['listFiles'] as $key => $value) {
+                    if(isset($value['config'])){
+                        $arr_conf = Qlib::lib_json_array($value['config']);
+                        if(isset($arr_conf['extenssao']) && !empty($arr_conf['extenssao']))
+                        {
+                            if($arr_conf['extenssao'] == 'jpg' || $arr_conf['extenssao']=='png' || $arr_conf['extenssao'] == 'jpeg'){
+                                $tipo = 'image';
+                            }elseif($arr_conf['extenssao'] == 'doc' || $arr_conf['extenssao'] == 'docx') {
+                                $tipo = 'word';
+                            }elseif($arr_conf['extenssao'] == 'xls' || $arr_conf['extenssao'] == 'xlsx') {
+                                $tipo = 'excel';
+                            }else{
+                                $tipo = 'download';
+                            }
+                        }
+                        $config['listFiles'][$key]['tipo_icon'] = $tipo;
+                    }
+                }
+            }
+            if($config['parte']){
+                $view = 'qlib.uploads.painel';
+                return view($view, ['config'=>$config]);
+            }else{
+                return false;
+            }
+        }else{
+            return false;
+        }
+    }
+
 }

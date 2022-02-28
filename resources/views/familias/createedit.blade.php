@@ -7,6 +7,9 @@
 @stop
 @section('content')
 <div class="row">
+    <div class="col-md-12 mens">
+        {{ App\Qlib\Qlib::formatMensagem( $_GET) }}
+    </div>
     <div class="col-md-8">
         <div class="card card-primary">
             <div class="card-header">
@@ -33,7 +36,12 @@
                 </div>
             </div>
             <div class="card-body">
-
+                {{App\Qlib\Qlib::gerUploadAquivos([
+                    'pasta'=>'familias/'.date('Y').'/'.date('m'),
+                    'token_produto'=>$familia['token'],
+                    'tab'=>'familias',
+                    'listFiles'=>$listFiles,
+                ])}}
             </div>
         </div>
     </div>

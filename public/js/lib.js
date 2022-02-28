@@ -216,7 +216,7 @@ function delRegistro(id){
     //console.log(k.name);
   });
   //var var_cartao = atob(arr['var_cartao']);
-  $.ajaxSetup({
+    $.ajaxSetup({
          headers: {
              'X-CSRF-TOKEN': jQuery('meta[name="csrf-token"]').attr('content')
          }
@@ -625,4 +625,102 @@ function lib_trataRemoveUrl(campo,valor,urlinic){
 			//console.log(urlAtua[1]);
 	}
 	return ret;
+}
+function visualizaArquivos(token_produto,ajaxurl){
+
+    $.ajax({
+        type: 'GET',
+        url: ajaxurl,
+        data: {
+            token_produto:token_produto,
+        },
+        dataType: 'json',
+        success: function (data) {
+
+          if(data.exec && data.arquivos){
+            var list = listFiles(data.arquivos,token_produto);
+            $('#lista-files').html(list);
+            if(data.mens){
+              lib_formatMensagem('.mens',data.mens,'success');
+            }
+          }else{
+            lib_formatMensagem('.mens',data.mens,'danger');
+          }
+        },
+        error: function (data) {
+            console.log(data);
+        }
+    });
+}
+function listFiles(arquivos,token_produto){
+    if(typeof token_produto == 'undefined'){
+        token_produto = '';
+    }
+    if(arquivos.length>0){
+        var tema1 = '<ul class="list-group">{li}</ul>';
+        var tema2 = '<li class="list-group-item d-flex justify-content-between align-items-center" id="item-{id}">'+
+        '<a href="{href}" target="_blank">{icon} {nome}</a>'+
+        '<button type="button" {event} class="btn btn-default" title="Excluir"><i class="fas fa-trash "></i></button></li>';
+        var li = '';
+        var temaIcon = '<i class="fas fa-file-{tipo} fa-2x"></i>';
+        for (let index = 0; index < arquivos.length; index++) {
+            const arq = arquivos[index];
+            var event = 'onclick="excluirArquivo(\''+arq.id+'\',\'/uploads/'+arq.id+'\')"';
+            var href = '/storage/'+arq.pasta;
+            var icon = '';
+            li += tema2.replace('{event}',event);
+            li = li.replace('{nome}',arq.nome);
+            li = li.replace('{id}',arq.id);
+            li = li.replace('{href}',href);
+            if(conf = arq.config){
+                var config = JSON.parse(conf);
+                if(config.extenssao == 'jpg' || config.extenssao=='png' || config.extenssao == 'jpeg'){
+                    var tipo = 'image';
+                }else if(config.extenssao == 'doc' || config.extenssao == 'docx') {
+                    var tipo = 'word';
+                }else if(config.extenssao == 'xls' || config.extenssao == 'xlsx') {
+                    var tipo = 'excel';
+                }else{
+                    var tipo = 'download';
+                }
+                icon = temaIcon.replace('{tipo}',tipo);
+            }
+            li = li.replace('{icon}',icon);
+        }
+        ret = tema1.replace('{li}',li);
+        return ret;
+
+    }
+}
+function excluirArquivo(id,ajaxurl){
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': jQuery('meta[name="csrf-token"]').attr('content')
+        }
+    });
+    $.ajax({
+        type: 'POST',
+        url: ajaxurl,
+        data: {
+            id:id,
+        },
+        dataType: 'json',
+        success: function (data) {
+
+          if(data.exec){
+            //cancelEdit(id,'del');
+            $('#item-'+id).remove();
+            if(data.dele_file){
+              lib_formatMensagem('.mens','Arquivo excluido com sucesso!','success');
+            }
+          }else{
+            lib_formatMensagem('.mens','Erro ao excluir entre em contato com o suporte','danger');
+          }
+
+
+        },
+        error: function (data) {
+            console.log(data);
+        }
+    });
 }

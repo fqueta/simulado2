@@ -47,8 +47,8 @@ class UserController extends Controller
     }
     public function paginacaoAjax()
     {
-        $users = user::orderBy('name');
-        return DataTables::of($users)->make(true);
+        //$users = user::orderBy('name');
+        //return DataTables::of($users)->make(true);
     }
     public function create(User $user)
     {

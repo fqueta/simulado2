@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Familia;
 use App\Qlib\Qlib;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class TesteController extends Controller
 {
@@ -19,7 +21,10 @@ class TesteController extends Controller
         //echo __FILE__;
        // $dados = Auth::check();
         //$dados = Qlib::sql_array("SELECT id,nome FROM escolaridades ORDER BY nome ", 'nome', 'id');
-        //dd($dados);
+        //$dados = DB::select("SELECT * FROM familias WHERE excluido='n' AND deletado='n' ORDER BY id DESC");
+        //$dados = Familia::where('excluido','=','n')->where('deletado','=','n')->OrderBy('id','desc')->get();
+        $dados = DB::table('familias')->where('excluido','=','n')->where('deletado','=','n')->OrderBy('id','desc')->get();
+        dd($dados);
         return view('teste');
     }
 

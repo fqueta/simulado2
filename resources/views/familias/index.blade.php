@@ -11,7 +11,7 @@
     @include('familias.config_exibe')
     @if(isset($_GET['mens']) && !empty($_GET['mens']))
         <div class="col-md-12 mens">
-            {{ App\Qlib\Qlib::formatMensagem( $_GET) }}</p>
+            {{ App\Qlib\Qlib::formatMensagem( $_GET) }}
         </div>
     @endif
     @can('is_admin')
@@ -73,7 +73,7 @@
         </div>
         <div class="card-body">
             <div class="table-responsive">
-                @include('familias.table');
+                @include('familias.table')
             </div>
         </div>
         <div class="card-footer">

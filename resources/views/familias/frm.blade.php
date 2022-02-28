@@ -148,12 +148,16 @@
             @enderror
         </div>
         <div class="form-row col-md-12">
-            <div class="col-md-6">
-                <div class="custom-control custom-switch">
-                    <input type="checkbox" @if(isset($familia['idoso']) && $familia['idoso']=='s') checked @endif value="s" name="idoso" class="custom-control-input" id="customSwitch1">
-                    <label class="custom-control-label" for="customSwitch1">Idoso</label>
-                </div>
-            </div>
+            {{App\Qlib\Qlib::qForm([
+                'type'=>'chave_checkbox',
+                'campo'=>'idoso',
+                'label'=>'Idoso',
+                'arr_opc'=>'',
+                'checked'=>@$familia['idoso'],
+                'value'=>'s',
+                'tam'=>'6',
+            ])}}
+
             <div class="col-md-6">
                 <div class="custom-control custom-switch">
                     <input type="checkbox" @if(isset($familia['crianca_adolescente']) && $familia['crianca_adolescente']=='s') checked @endif value="s" name="crianca_adolescente" class="custom-control-input" id="customSwitch2">
