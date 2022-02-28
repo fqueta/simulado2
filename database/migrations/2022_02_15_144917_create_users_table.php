@@ -24,6 +24,7 @@ class CreateUsersTable extends Migration
             $table->enum('profile',['dev','admin','user']);
             $table->rememberToken();
             $table->timestamps();
+            $table->text('image')->nullable();
         });
     }
 
