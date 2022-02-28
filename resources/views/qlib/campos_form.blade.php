@@ -5,7 +5,7 @@
             @if ($config['label'])
                  <label for="{{$config['campo']}}">{{$config['label']}}</label>
             @endif
-            <select name="{{$config['campo']}}" {{$config['event']}} id="sele-{{$config['campo']}} @error($config['campo']) is-invalid @enderror" class="form-control selectpicker {{$config['class']}}">
+            <select name="{{$config['campo']}}" {{$config['event']}} id="sele-{{$config['campo']}} @error($config['campo']) is-invalid @enderror" class="form-control custom-select selectpicker {{$config['class']}}">
                 @if ($config['option_select'])
                     <option value=""> {{$config['label_option_select']}} </option>
                 @endif

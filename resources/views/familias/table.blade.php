@@ -1,4 +1,4 @@
-<table class="table table-hover dataTable" style="width: 200%">
+<table class="table table-hover table-striped dataTable" style="width: 200%">
     <thead>
         <tr>
             <th class="text-center">...</th>
