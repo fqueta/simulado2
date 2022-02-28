@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\_upload;
 use App\Qlib\Qlib;
+use Facade\FlareClient\Http\Response;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -49,29 +50,34 @@ class UploadController extends Controller
         //$fileNameToStore= $filename.'_'.time().'.'.$extension;
         $fileNameToStore= $filename.'_'.time().'.'.$extension;
         // Upload Image
-        $dados = $request->all();
-        $token_produto = $dados['token_produto'];
-        $ultimoValor = _upload::where('token_produto','=',$token_produto)->max('ordem');
-        $ordem = $ultimoValor ? $ultimoValor : 0;
-        $ordem++;
-        $pasta = $dados['pasta'];
-        $nomeArquivoSavo = $file->storeAs($pasta,$fileNameToStore);
-        //$nomeArquivoSavo = $file->move($fileNameToStore,$pasta);
-        $exec = false;
-
-        if($nomeArquivoSavo){
-            $exec = true;
-
-            $salvar = _upload::create([
-                'token_produto'=>$token_produto,
-                'pasta'=>$nomeArquivoSavo,
-                'ordem'=>$ordem,
-                'nome'=>$filenameWithExt,
-                'config'=>json_encode(['extenssao'=>$extension])
-            ]);
+        //dd($extension);
+        if($extension=='jpg' || $extension=='jpeg' || $extension=='png' || $extension=='zip' || $extension=='pdf' || $extension=='PDF'){
+            $dados = $request->all();
+            $token_produto = $dados['token_produto'];
+            $ultimoValor = _upload::where('token_produto','=',$token_produto)->max('ordem');
+            $ordem = $ultimoValor ? $ultimoValor : 0;
+            $ordem++;
+            $pasta = $dados['pasta'];
+            $nomeArquivoSavo = $file->storeAs($pasta,$fileNameToStore);
+            $exec = false;
+            $salvar = false;
+            if($nomeArquivoSavo){
+                $exec = true;
+                $salvar = _upload::create([
+                    'token_produto'=>$token_produto,
+                    'pasta'=>$nomeArquivoSavo,
+                    'ordem'=>$ordem,
+                    'nome'=>$filenameWithExt,
+                    'config'=>json_encode(['extenssao'=>$extension])
+                ]);
+            }
+            //$lista = _upload::where('token_produto','=',$token_produto)->get();
+            if($salvar){
+                return response()->json(['Arquivo enviado com sucesso'=>200]);
+            }
+        }else{
+            return response()->json('O Formato .'.$extension.' não é permitido', 400);
         }
-        $lista = _upload::where('token_produto','=',$token_produto)->get();
-        return response()->json(['success'=>$nomeArquivoSavo,'salvar'=>$salvar,'exec'=>$exec,'lista'=>$lista]);
     }
 
     public function storeVarios(Request $request)

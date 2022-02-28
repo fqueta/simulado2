@@ -23,8 +23,7 @@ class TesteController extends Controller
         //$dados = Qlib::sql_array("SELECT id,nome FROM escolaridades ORDER BY nome ", 'nome', 'id');
         //$dados = DB::select("SELECT * FROM familias WHERE excluido='n' AND deletado='n' ORDER BY id DESC");
         //$dados = Familia::where('excluido','=','n')->where('deletado','=','n')->OrderBy('id','desc')->get();
-        $dados = DB::table('familias')->where('excluido','=','n')->where('deletado','=','n')->OrderBy('id','desc')->get();
-        dd($dados);
+        //$dados = DB::table('familias')->where('excluido','=','n')->where('deletado','=','n')->OrderBy('id','desc')->get();
         return view('teste');
     }
 
