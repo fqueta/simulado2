@@ -7,6 +7,20 @@
 @stop
 @section('content')
   <!--<p>Selecione os publicadores do seu familia para enviar o relatorio para o secretário</p>-->
+  <style media="print">
+      #DataTables_Table_0_wrapper .row:first-child{
+          display: none;
+      }
+      .table td{
+          padding: 0%;
+      }
+      .table thead th{
+          padding: 0%;
+      }
+      #lista .card-body{
+          padding: 0%;
+      }
+  </style>
   <div class="row">
     @include('familias.config_exibe')
     @if(isset($_GET['mens']) && !empty($_GET['mens']))
@@ -15,7 +29,7 @@
         </div>
     @endif
     @can('is_admin')
-    <div class="col-md-12">
+    <div class="col-md-12 d-print-none">
       <div class="row pl-2 pr-2">
           <div class="col-md-3 info-box mb-3">
               <span class="info-box-icon bg-default elevation-1"><i class="fas fa-users"></i></span>
@@ -48,7 +62,7 @@
       </div>
     </div>
 @endcan
-    <div class="col-md-12">
+    <div class="col-md-12" id="lista">
       <div class="card">
         <div class="card-header">
             <h4 class="card-title">
@@ -63,12 +77,12 @@
                 @endif
             </h4>
             @can('is_admin')
-            <div class="card-tools d-flex">
+            <div class="card-tools d-flex d-print-none">
                     @include('familias.dropdow_actions')
                     <a href="{{ route('familias.create') }}" class="btn btn-success">
                         <i class="fa fa-plus" aria-hidden="true"></i> Cadastrar família
                     </a>
-                </div>
+            </div>
             @endcan
         </div>
         <div class="card-body">
@@ -76,10 +90,12 @@
                 @include('familias.table')
             </div>
         </div>
-        <div class="card-footer">
-            @if ($config['limit']!='todos')
+        <div class="card-footer d-print-none">
+            <div class="table-responsive">
+                @if ($config['limit']!='todos')
                 {{ $familias->appends($_GET)->links() }}
-            @endif
+                @endif
+            </div>
         </div>
       </div>
     </div>

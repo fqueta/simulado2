@@ -54,8 +54,7 @@
 @stop
 
 @section('js')
-    <script src="{{url('/')}}/js/jquery.inputmask.bundle.min.js"></script>
-    <script src=" {{url('/')}}/js/lib.js"></script>
+    @include('qlib.jslib')
     <script type="text/javascript">
           $(function(){
             $('a.print-card').on('click',function(e){
@@ -63,6 +62,22 @@
             });
             $('#cpf,#cpf_conjuge').inputmask('999.999.999-99');
           });
-
+          $(function(){
+          $('[type="submit"]').on('click',function(e){
+                e.preventDefault();
+                submitFormulario($('#frm-familias'),function(res){
+                    if(res.exec){
+                        lib_formatMensagem('.mens',res.mens,res.color);
+                    }
+                    if(res.return){
+                        window.location = res.return
+                    }
+                    if(res.errors){
+                        alert('erros');
+                        console.log(res.errors);
+                    }
+                });
+          });
+    });
     </script>
 @stop

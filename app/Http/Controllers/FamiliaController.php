@@ -84,9 +84,9 @@ class FamiliaController extends Controller
                     $familia = $familia->paginate($config['limit']);
                 }
                 $familia_totais->todos = $fm->count();
-                $familia_totais->esteMes = $fm->whereYear('created_at', '=', $ano)->whereMonth('created_at','=',$mes)->count();
                 $familia_totais->idoso = $fm->where('idoso','=','s')->count();
                 $familia_totais->criancas = $fm->where('crianca_adolescente','=','s')->count();
+                $familia_totais->esteMes = $fm->whereYear('created_at', '=', $ano)->whereMonth('created_at','=',$mes)->count();
 
         }else{
             $fm = $familia;
@@ -96,9 +96,9 @@ class FamiliaController extends Controller
                 $familia = $familia->paginate($config['limit']);
             }
             $familia_totais->todos = $fm->count();
-            $familia_totais->esteMes = $fm->whereYear('created_at', '=', $ano)->whereMonth('created_at','=',$mes)->count();
             $familia_totais->idoso = $fm->where('idoso','=','s')->count();
             $familia_totais->criancas = $fm->where('crianca_adolescente','=','s')->count();
+            $familia_totais->esteMes = $fm->whereYear('created_at', '=', $ano)->whereMonth('created_at','=',$mes)->count();
         }
         $ret['familia'] = $familia;
         $ret['familia_totais'] = $familia_totais;
@@ -106,7 +106,7 @@ class FamiliaController extends Controller
         $ret['campos'] = $campos;
         $ret['config'] = $config;
         $ret['tituloTabela'] = $tituloTabela;
-
+        //dd($ret);
         return $ret;
     }
     public function index(User $user)
@@ -175,8 +175,8 @@ class FamiliaController extends Controller
         $arr_user = ['ac'=>'cad'];
         //$roles = DB::select("SELECT * FROM roles ORDER BY id ASC");
         $familia = ['ac'=>'cad','token'=>uniqid()];
-        $arr_escolaridade = $dados = Qlib::sql_array("SELECT id,nome FROM escolaridades ORDER BY nome ", 'nome', 'id');
-        $arr_estadocivil = $dados = Qlib::sql_array("SELECT id,nome FROM estadocivils ORDER BY nome ", 'nome', 'id');
+        $arr_escolaridade = Qlib::sql_array("SELECT id,nome FROM escolaridades ORDER BY nome ", 'nome', 'id');
+        $arr_estadocivil = Qlib::sql_array("SELECT id,nome FROM estadocivils ORDER BY nome ", 'nome', 'id');
         return view('familias.createedit',[
             'familia'=>$familia,
             'title'=>$title,
@@ -190,6 +190,7 @@ class FamiliaController extends Controller
     {
         //$validated = $request->validated();
         $dados = $request->all();
+        $ajax = isset($dados['ajax'])?$dados['ajax']:'n';
         if (isset($dados['image']) && $dados['image']->isValid()){
             $nameFile = Str::of($dados['name'])->slug('-').'.'.$dados['image']->getClientOriginalExtension();
             $image = $dados['image']->storeAs('users',$nameFile);
@@ -203,9 +204,23 @@ class FamiliaController extends Controller
         $dados['crianca_adolescente'] = isset($dados['crianca_adolescente'])?:'n';
         $dados['autor'] = $userLogadon;
         $dados['token'] = uniqid();
-        //dd($dados);
+        $renda_familiar = str_replace('R$','',$dados['renda_familiar']);
+        $dados['renda_familiar'] = Qlib::precoBanco($renda_familiar);
+
         $salvar = Familia::create($dados);
-        return redirect()->route('familias.index',['mens'=>'Salvo com sucesso!','color'=>'success']);
+        $route = 'familias.index';
+        $ret = [
+            'mens'=>'Salvo com sucesso!',
+            'color'=>'success',
+            'idCad'=>$salvar->id,
+        ];
+
+        if($ajax=='s'){
+            $ret['return'] = route($route).'?idCad='.$salvar->id;
+            return response()->json($ret);
+        }else{
+            return redirect()->route($route,$ret);
+        }
     }
 
     public function show(Familia $familia)
@@ -233,31 +248,40 @@ class FamiliaController extends Controller
             if(isset($dados[0]['token'])){
                 $listFiles = _upload::where('token_produto','=',$dados[0]['token'])->get();
             }
-
-            return view('familias.createedit',[
+            $ret = [
                 'familia'=>$dados[0],
                 'title'=>$title,
                 'titulo'=>$titulo,
                 'arr_escolaridade'=>$arr_escolaridade,
                 'arr_estadocivil'=>$arr_estadocivil,
                 'listFiles'=>$listFiles,
-            ]);
+                'exec'=>true,
+            ];
+
+            return view('familias.createedit',$ret);
         }else{
-          return redirect()->route('familias.index');
+            $ret = [
+                'exec'=>false,
+            ];
+            return redirect()->route('familias.index',$ret);
         }
     }
     public function update(StoreFamilyRequest $request, $id)
     {
         $data = [];
         $dados = $request->all();
-        //dd($dados);
+        $ajax = isset($dados['ajax'])?$dados['ajax']:'n';
         foreach ($dados as $key => $value) {
-            if($key!='_method'&&$key!='_token'&&$key!='ac'){
+            if($key!='_method'&&$key!='_token'&&$key!='ac'&&$key!='ajax'){
                 if($key=='data_batismo' || $key=='data_nasci'){
                     if($value=='0000-00-00' || $value=='00/00/0000'){
                     }else{
                         $data[$key] = Qlib::dtBanco($value);
                     }
+                }elseif($key == 'renda_familiar') {
+                    $value = str_replace('R$','',$value);
+                    $data[$key] = Qlib::precoBanco($value);
+                    //$data[$key] = number_format($value,2,'.','');
                 }else{
                     $data[$key] = $value;
                 }
@@ -273,9 +297,29 @@ class FamiliaController extends Controller
         $atualizar=false;
         if(!empty($data)){
             $atualizar=Familia::where('id',$id)->update($data);
-            return redirect()->route('familias.index',['id'=>$id,'mens'=>'Salvo com sucesso!','color'=>'success']);
+            $route = 'familias.index';
+            $ret = [
+                'exec'=>true,
+                'id'=>$id,
+                'mens'=>'Salvo com sucesso!',
+                'color'=>'success',
+                'idCad'=>$id,
+                'return'=>$route,
+            ];
         }else{
-            return redirect()->route('familias.edit',['id'=>$id,'mens'=>'Erro ao receber dados','color'=>'danger']);
+            $route = 'familias.edit';
+            $ret = [
+                'exec'=>false,
+                'id'=>$id,
+                'mens'=>'Erro ao receber dados',
+                'color'=>'danger',
+            ];
+        }
+        if($ajax=='s'){
+            $ret['return'] = route($route).'?idCad='.$id;
+            return response()->json($ret);
+        }else{
+            return redirect()->route($route,$ret);
         }
     }
 
@@ -290,10 +334,7 @@ class FamiliaController extends Controller
         if (!$post = Familia::find($id))
             return redirect()->route('familias.index',['mens'=>'Registro não encontrado!','color'=>'danger']);
 
-        //if (Storage::exists($post->image))
-            //Storage::delete($post->image);
-
         Familia::where('id',$id)->delete();
-            return redirect()->route('familias.index',['mens'=>'Registro deletado com sucesso!','color'=>'success']);
+        return redirect()->route('familias.index',['mens'=>'Registro deletado com sucesso!','color'=>'success']);
     }
 }

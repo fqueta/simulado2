@@ -376,16 +376,16 @@ $config = [
             ],
         ],
         'Select2' => [
-            'active' => false,
+            'active' => true,
             'files' => [
                 [
                     'type' => 'js',
-                    'asset' => false,
+                    'asset' => true,
                     'location' => '//cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js',
                 ],
                 [
                     'type' => 'css',
-                    'asset' => false,
+                    'asset' => true,
                     'location' => '//cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.css',
                 ],
             ],
@@ -478,26 +478,65 @@ $config['menu'] = [
       [
           'text' => 'Painel',
           'url'  => 'home',
-          'icon' => 'fas fa-chart-line',
+          'icon' => 'fa fa-tachometer-alt',
       ],
-      /*
-      'PUBLICADORES',
+
+      'CADASTROS',
       [
-          'text' => 'Adicionar publicador',
-          'url'  => 'publicadores/create',
-          'icon' => 'fas fa-fw fa-plus',
-      ],*/
+          'text' => 'Cadastros de Famílias',
+          'url'  => '#',
+          'icon' => 'fa fa-copy',
+          'submenu'=>[
+                [
+                    'text' => 'Novo cadastro',
+                    'url'  => 'familias/create',
+                    'icon' => 'fas fa-fw fa-plus',
+                    'can'  => 'is_admin',
+                ],
+                [
+                    'text' => 'Todos cadastros',
+                    'url'  => 'familias',
+                    'icon' => 'fa fa-list',
+                    'can'  => 'is_admin',
+                ]
+            ],
+      ],
       [
-          'text' => 'Familias',
-          'url'  => 'familias',
+          'text' => 'Relatórios',
+          'url'  => '#',
+          'icon' => 'fa fa-file',
+          'submenu'=>[
+                [
+                    'text' => 'Geral',
+                    'url'  => 'relatorios/geral',
+                    'icon' => 'fas fa-file',
+                    'can'  => 'is_admin',
+                ],
+                [
+                    'text' => 'Evolução',
+                    'url'  => 'relatorios/evolucao',
+                    'icon' => 'fa fa-chart-bar nav-icon',
+                    'can'  => 'is_admin',
+                ]
+            ],
+      ],
+      'SISTEMA',
+      [
+          'text' => 'Perfil',
+          'url'  => 'perfil',
           'icon' => 'fas fa-fw fa-user',
           'can'  => 'is_admin',
-      ],/*
-      'CONFIGURAÇÕES',*/
+      ],
       [
           'text' => 'Usuários',
-          'url'  => 'users/',
+          'url'  => 'users',
           'icon' => 'fas fa-fw fa-user-friends',
+          'can'  => 'is_admin',
+      ],
+      [
+          'text' => 'Configurações',
+          'url'  => 'config',
+          'icon' => 'fas fa-fw fa-cog',
           'can'  => 'is_admin',
       ],
   ];

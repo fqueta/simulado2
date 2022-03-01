@@ -1,4 +1,4 @@
-<div class="col-md-12">
+<div class="col-md-12 d-print-none">
     <div class="card">
         <form action="" id="frm-consulta" method="GET">
             <div class="row mr-0 ml-0">

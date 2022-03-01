@@ -62,7 +62,16 @@ class Qlib
 		}
 		return $ret;
 	}
-
+    static function precoBanco($preco){
+            $sp = substr($preco,-3,-2);
+            if($sp=='.'){
+                $preco_venda1 = $preco;
+            }else{
+                $preco_venda1 = str_replace(".", "", $preco);
+                $preco_venda1 = str_replace(",", ".", $preco_venda1);
+            }
+            return $preco_venda1;
+    }
     static function isJson($string) {
 		$ret=false;
 		if (is_object(json_decode($string)) || is_array(json_decode($string)))

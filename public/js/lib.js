@@ -727,3 +727,54 @@ function excluirArquivo(id,ajaxurl){
 function carregaDropZone(seletor){
     $(seletor).dropzone({ url: "/file/post" });
 }
+function submitFormulario(objForm,funCall,funError){
+    if(typeof funCall == 'undefined'){
+        funCall = function(res){
+            console.log(res);
+        }
+    }
+    if(typeof funError == 'undefined'){
+        funError = function(res){
+            lib_funError(res);
+        }
+    }
+    var route = objForm.attr('action');
+    console.log(route);
+    $.ajax({
+        type: 'POST',
+        url: route,
+        data: objForm.serialize()+'&ajax=s',
+        dataType: 'json',
+        success: function (data) {
+            funCall(data);
+        },
+        error: function (data) {
+            if(data.responseJSON.errors){
+                funError(data.responseJSON.errors);
+                console.log(data.responseJSON.errors);
+            }else{
+                lib_formatMensagem('.mens','Erro','danger');
+            }
+        }
+    });
+}
+function lib_funError(res){
+    var mens = '';
+    Object.entries(res).forEach(([key, value]) => {
+        console.log(key + ' ' + value);
+        var s = $('[name="'+key+'"]');
+        var v = s.val();
+        mens += value+'<br>';
+        if(key=='cpf'){
+           s.addClass('is-invalid');
+        }else{
+            if(v=='')
+                s.addClass('is-invalid');
+            else{
+                s.removeClass('is-invalid');
+            }
+        }
+    });
+    lib_formatMensagem('.mens',mens,'danger');
+
+}

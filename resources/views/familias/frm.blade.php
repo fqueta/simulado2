@@ -1,5 +1,5 @@
 
-<form class="" action="@if($familia['ac']=='cad'){{ route('familias.store') }}@elseif($familia['ac']=='alt'){{ route('familias.update',['id'=>$familia['id']]) }}@endif" method="post">
+<form id="frm-familias" class="" action="@if($familia['ac']=='cad'){{ route('familias.store') }}@elseif($familia['ac']=='alt'){{ route('familias.update',['id'=>$familia['id']]) }}@endif" method="post">
     @if($familia['ac']=='alt')
     @method('PUT')
     @endif
@@ -140,13 +140,16 @@
                 <div class="alert alert-danger">{{ $message }}</div>
             @enderror
         </div>
-        <div class="form-group col-md-3">
-            <label for="renda_familiar" title="quantidade de membros">Renda familiar</label>
-            <input type="text" class="form-control @error('renda_familiar') is-invalid @enderror" id="renda_familiar" name="renda_familiar" aria-describedby="renda_familiar" placeholder="Renda familiar" value="@if(isset($familia['renda_familiar'])){{$familia['renda_familiar']}}@elseif($familia['ac']=='cad'){{old('renda_familiar')}}@endif" />
-            @error('renda_familiar')
-                <div class="alert alert-danger">{{ $message }}</div>
-            @enderror
-        </div>
+        {{App\Qlib\Qlib::qForm([
+            'type'=>'text',
+            'campo'=>'renda_familiar',
+            'label'=>'Renda familiar',
+            'class'=>'moeda',
+            'value'=>number_format(@$familia['renda_familiar'],2,',','.'),
+            'tam'=>'3',
+            'option_select'=>true,
+        ])}}
+
         <div class="form-row col-md-12">
             {{App\Qlib\Qlib::qForm([
                 'type'=>'chave_checkbox',

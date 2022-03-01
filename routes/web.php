@@ -75,7 +75,7 @@ Route::prefix('uploads')->group(function(){
 });
 
 Route::fallback(function () {
-    return "Página não encontrada!";
+    return view('erro404');
 });
 Route::get('/teste',[App\Http\Controllers\TesteController::class,'index'])->name('teste');
 Route::post('/upload',[App\Http\Controllers\UploadFile::class,'upload'])->name('teste.upload');
