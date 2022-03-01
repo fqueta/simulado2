@@ -40,7 +40,7 @@
                     'pasta'=>'familias/'.date('Y').'/'.date('m'),
                     'token_produto'=>$familia['token'],
                     'tab'=>'familias',
-                    'listFiles'=>$listFiles,
+                    'listFiles'=>@$listFiles,
                 ])}}
             </div>
         </div>
