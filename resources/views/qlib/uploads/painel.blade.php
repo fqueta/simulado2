@@ -64,7 +64,7 @@
             </script>
         -->
 @endif
-@if ($config['parte']=='lista' && isset($config['listFiles']) && is_array($config['listFiles']))
+@if ($config['parte']=='lista' && isset($config['listFiles']) && is_object($config['listFiles']))
     <ul class="list-group">
         @foreach ($config['listFiles'] as $k=>$vl)
 
