@@ -535,9 +535,22 @@ function clientes_mascaraTelefone(v) {
 function confirmDelete(obj){
     var id = obj.data('id');
     if(window.confirm('DESEJA MESMO EXCLUIR?')){
-         $('#frm-'+id).submit();
+        // $('#frm-'+id).submit();
+        submitFormulario($('#frm-'+id),function(res){
+            if(res.mens){
+                lib_formatMensagem('.mens',res.mens,res.color);
+            }
+            if(res.return){
+                location.reload();
+                //window.location = res.return
+            }
+            if(res.errors){
+                alert('erros');
+                console.log(res.errors);
+            }
+        });
     }
-        //alert('modal agora');
+
 }
 function urlAtual(){
     return window.location.href;

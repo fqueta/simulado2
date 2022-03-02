@@ -23,11 +23,8 @@
   </style>
   <div class="row">
     @include('familias.config_exibe')
-    @if(isset($_GET['mens']) && !empty($_GET['mens']))
-        <div class="col-md-12 mens">
-            {{ App\Qlib\Qlib::formatMensagem( $_GET) }}
-        </div>
-    @endif
+    <div class="col-md-12 mens">
+    </div>
     @can('is_admin')
     <div class="col-md-12 d-print-none">
       <div class="row pl-2 pr-2">

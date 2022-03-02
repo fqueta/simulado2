@@ -329,12 +329,25 @@ class FamiliaController extends Controller
      * @param  \App\Models\Familia  $familia
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($id,Request $request)
     {
-        if (!$post = Familia::find($id))
-            return redirect()->route('familias.index',['mens'=>'Registro não encontrado!','color'=>'danger']);
+        $config = $request->all();
+        $ajax =  isset($config['ajax'])?$config['ajax']:'n';
+        if (!$post = Familia::find($id)){
+            if($ajax=='s'){
+                $ret = response()->json(['mens'=>'Registro não encontrado!','color'=>'danger','return'=>route('familias.index')]);
+            }else{
+                $ret = redirect()->route('familias.index',['mens'=>'Registro não encontrado!','color'=>'danger']);
+            }
+            return $ret;
+        }
 
         Familia::where('id',$id)->delete();
-        return redirect()->route('familias.index',['mens'=>'Registro deletado com sucesso!','color'=>'success']);
+        if($ajax=='s'){
+            $ret = response()->json(['mens'=>__('Registro '.$id.' deletado com sucesso!'),'color'=>'success','return'=>route('familias.index')]);
+        }else{
+            $ret = redirect()->route('familias.index',['mens'=>'Registro deletado com sucesso!','color'=>'success']);
+        }
+        return $ret;
     }
 }
