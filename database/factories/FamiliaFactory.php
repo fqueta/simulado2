@@ -62,7 +62,7 @@ class FamiliaFactory extends Factory
             }elseif($campo=='loteamento'){
                 $arr = ['1','2','3','4'];
             }elseif($campo=='etapa'){
-                $arr = ['1','2','3','4'];
+                $arr = ['1','2','3','4','5','6','7','8'];
             }elseif($campo=='idoso'||$campo=='crianca_adolescente'){
                 $arr = ['s','n'];
             }elseif($campo=='renda_familiar'){
