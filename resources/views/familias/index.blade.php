@@ -127,6 +127,8 @@
                 if(d[1]){
                     url = $(this).attr('href');
                     url = url+'?'+d[1];
+                }else{
+                    url = $(this).attr('href');
                 }
                 if(url)
                     abrirjanelaPadrao(url);
