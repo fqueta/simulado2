@@ -13,3 +13,9 @@
 .event-edit{
   cursor: pointer;
 }
+table.familias td{
+    max-width: 15ch;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}

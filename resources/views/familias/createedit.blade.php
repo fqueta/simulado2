@@ -69,7 +69,7 @@
             $('a.print-card').on('click',function(e){
                 openPageLink(e,$(this).attr('href'),"{{date('Y')}}");
             });
-            $('#cpf,#cpf_conjuge').inputmask('999.999.999-99');
+            $('#inp-cpf,#inp-cpf_conjuge').inputmask('999.999.999-99');
           });
           $(function(){
           $('[type="submit"]').on('click',function(e){

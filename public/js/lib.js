@@ -872,7 +872,8 @@ function initSelector(obj){
             tf = tf.replace('{action}',d.action);
             modalGeral(m,'Cadastrar '+d.label,tf);
             //obj.find('option').attr('selected',false);
-            obj.find('option[value=\'\']:first').attr('selected','selected');
+            //obj.find('option[value=\'\']:first').attr('selected','selected');
+            obj.find('option[value=\'\']').attr('selected','selected');
             $('[f-submit]').remove();
             $(b).insertAfter(m+' .modal-footer button');
             $('[f-submit]').on('click',function(){

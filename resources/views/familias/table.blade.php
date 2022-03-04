@@ -1,4 +1,4 @@
-<table class="table table-hover table-striped dataTable" style="width: 200%">
+<table class="table table-hover table-striped dataTable {{$routa}}" style="width: 200%">
     <thead>
         <tr>
             <th class="text-center d-print-none">...</th>

@@ -18,7 +18,7 @@
         padding: 0%;
     }
 </style>
-<table class="table table-hover table-striped dataTable" style="{{@$style}}">
+<table class="table table-hover table-striped dataTable {{$routa}}" style="{{@$style}}">
     <thead>
         <tr>
             <th class="text-center d-print-none">...</th>
@@ -40,7 +40,7 @@
     <tbody>
         @if(isset($dados))
             @foreach($dados as $key => $val)
-            <tr ondblclick="window.location='{{ route($routa.'.edit',['id'=>$val->id]) }}'" class="@if (isset($_GET['idCad']) && $_GET['idCad']==$val->id) bg-info @endif">
+            <tr ondblclick="window.location='{{ route($routa.'.edit',['id'=>$val->id]) }}'" class="@if (isset($_GET['idCad']) && $_GET['idCad']==$val->id) bg-info @endif" title="DÊ DOIS CLIQUES PARA ABRIR">
                     <td class="text-right d-flex d-print-none">
                         <a href=" {{ route($routa.'.edit',['id'=>$val->id]) }} " class="btn btn-light mr-2">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">

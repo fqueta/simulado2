@@ -20,5 +20,6 @@
         $('[selector-event]').on('change',function(){
             initSelector($(this));
         });
+        $('.select2').select2();
     });
 </script>

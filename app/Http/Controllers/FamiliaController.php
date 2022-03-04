@@ -167,7 +167,8 @@ class FamiliaController extends Controller
                     'label'=>'Bairro',
                 ],'arr_opc'=>Qlib::sql_array("SELECT id,nome FROM bairros",'nome','id'),'exibe_busca'=>'d-block',
                 'event'=>'',
-                'tam'=>'12'
+                'tam'=>'12',
+                'class'=>'select2'
             ],
             'etapa'=>[
                 'label'=>'Etapa de cadastro*',
@@ -211,6 +212,7 @@ class FamiliaController extends Controller
                 'arr_opc'=>Qlib::sql_array("SELECT id,nome FROM escolaridades",'nome','id'),'exibe_busca'=>'d-block',
                 'event'=>'',
                 'tam'=>'3',
+                'class'=>'select2',
             ],
             'estado_civil'=>[
                 'label'=>'Estado Civil',
@@ -228,6 +230,7 @@ class FamiliaController extends Controller
                 'arr_opc'=>Qlib::sql_array("SELECT id,nome FROM estadocivils",'nome','id'),'exibe_busca'=>'d-block',
                 'event'=>'',
                 'tam'=>'4',
+                'class'=>'select2',
             ],
             'qtd_membros'=>['label'=>'Membros','active'=>true,'type'=>'number','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
             'idoso'=>['label'=>'Idoso','active'=>true,'type'=>'chave_checkbox','value'=>'s','exibe_busca'=>'d-none','event'=>'','tam'=>'6','arr_opc'=>['s'=>'Sim','n'=>'Não']],

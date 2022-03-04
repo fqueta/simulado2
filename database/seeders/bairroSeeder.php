@@ -15,10 +15,12 @@ class bairroSeeder extends Seeder
     public function run()
     {
         $arr = [
-            ['nome'=>'Camponesa e adjacências com matricula','matricula'=>'624'],
-            ['nome'=>'Camponesa e adjacências sem matricula','matricula'=>''],
-            ['nome'=>'Santa luzia e adjacências com matricula','matricula'=>'654'],
-            ['nome'=>'Santa luzia e adjacências sem matricula','matricula'=>''],
+            ['nome'=>'Matozinhos com matrícula','matricula'=>'624'],
+            ['nome'=>'Matozinhos sem matrícula','matricula'=>''],
+            ['nome'=>'Novo Matozinhos com matrícula','matricula'=>'654'],
+            ['nome'=>'Novo Matozinhos sem matricula','matricula'=>''],
+            ['nome'=>'Córrego Pereira com matrícula','matricula'=>'657'],
+            ['nome'=>'Córrego Pereira sem matricula','matricula'=>''],
         ];
         foreach ($arr as $key => $value) {
             Bairro::create([
