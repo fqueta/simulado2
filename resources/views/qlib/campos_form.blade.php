@@ -24,7 +24,7 @@
                 @if ($config['label'])
                     <label for="{{$config['campo']}}">{{$config['label']}}</label>
                 @endif
-                <select name="{{$config['campo']}}" {{$config['event']}} data-selector="{{App\Qlib\Qlib::encodeArray($config['data_selector'])}}" selector-event id="sele-{{$config['campo']}} @error($config['campo']) is-invalid @enderror" class="form-control custom-select selectpicker {{$config['class']}}">
+                <select name="{{$config['campo']}}" {{$config['event']}} data-selector="{{App\Qlib\Qlib::encodeArray(@$config['data_selector'])}}" selector-event id="sele-{{$config['campo']}} @error($config['campo']) is-invalid @enderror" class="form-control custom-select selectpicker {{$config['class']}}">
                     @if ($config['option_select'])
                         <option value=""> {{$config['label_option_select']}} </option>
                     @endif

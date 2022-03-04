@@ -15,10 +15,11 @@
                         @foreach ($campos_tabela as $kbu=>$vbu)
                             @if ($vbu['active'])
                                 @php
-                                    if($vbu['type']!='text'){
+                                    if($vbu['type']!='text' && $kbu=='id'){
                                         $vbu['type'] = 'text';
                                     }
-                                    $vbu['tam'] = 3;
+                                    if($kbu!='obs')
+                                        $vbu['tam'] = 3;
                                 @endphp
                                 {{App\Qlib\Qlib::qForm([
                                     'type'=>isset($vbu['type'])?$vbu['type']:'text',

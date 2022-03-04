@@ -121,7 +121,7 @@ $config = [
     |
     */
 
-    'classes_body' => 'sidebar-collapse',
+    'classes_body' => '',
     'classes_brand' => '',
     'classes_brand_text' => '',
     'classes_content_wrapper' => '',
@@ -148,7 +148,7 @@ $config = [
     'sidebar_mini' => 'lg',
     'sidebar_collapse' => false,
     'sidebar_collapse_auto_size' => false,
-    'sidebar_collapse_remember' => false,
+    'sidebar_collapse_remember' => true,
     'sidebar_collapse_remember_no_transition' => true,
     'sidebar_scrollbar_theme' => 'os-theme-light',
     'sidebar_scrollbar_auto_hide' => 'l',
@@ -488,13 +488,13 @@ $config['menu'] = [
           'icon' => 'fa fa-copy',
           'submenu'=>[
                 [
-                    'text' => 'Novo família',
+                    'text' => 'Nova família',
                     'url'  => 'familias/create',
                     'icon' => 'fas fa-fw fa-plus',
                     'can'  => 'is_admin',
                 ],
                 [
-                    'text' => 'Todas familias',
+                    'text' => 'Familias',
                     'url'  => 'familias',
                     'icon' => 'fa fa-list',
                     'can'  => 'is_admin',

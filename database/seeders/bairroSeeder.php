@@ -15,9 +15,9 @@ class bairroSeeder extends Seeder
     public function run()
     {
         $arr = [
-            ['nome'=>'Matozinhos com matrícula','matricula'=>'624'],
+            ['nome'=>'Matozinhos com matrícula','matricula'=>'1262'],
             ['nome'=>'Matozinhos sem matrícula','matricula'=>''],
-            ['nome'=>'Novo Matozinhos com matrícula','matricula'=>'654'],
+            ['nome'=>'Novo Matozinhos com matrícula','matricula'=>'1262'],
             ['nome'=>'Novo Matozinhos sem matricula','matricula'=>''],
             ['nome'=>'Córrego Pereira com matrícula','matricula'=>'657'],
             ['nome'=>'Córrego Pereira sem matricula','matricula'=>''],

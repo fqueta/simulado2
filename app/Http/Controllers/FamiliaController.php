@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\URL;
 use App\Exports\UsersExport;
 use App\Models\Bairro;
+use App\Models\Etapa;
 use DataTables;
 use Illuminate\Support\Facades\Auth;
 
@@ -41,6 +42,9 @@ class FamiliaController extends Controller
         $get = isset($_GET) ? $_GET:[];
         $ano = date('Y');
         $mes = date('m');
+        $idUltimaEtapa = Etapa::where('ativo','=','s')->where('excluido','=','n')->where('deletado','=','n')->max('id');
+        $completos = 0;
+        $etapas = Etapa::where('ativo','=','s')->where('excluido','=','n')->OrderBy('id','asc')->get();
         //$todasFamilias = Familia::where('excluido','=','n')->where('deletado','=','n');
         $config = [
             'limit'=>isset($get['limit']) ? $get['limit']: 50,
@@ -48,6 +52,7 @@ class FamiliaController extends Controller
         ];
 
         $familia =  Familia::where('excluido','=','n')->where('deletado','=','n')->orderBy('id',$config['order']);
+        $countFam =  Familia::where('excluido','=','n')->where('deletado','=','n')->orderBy('id',$config['order']);
 
         //$familia =  DB::table('familias')->where('excluido','=','n')->where('deletado','=','n')->orderBy('id',$config['order']);
 
@@ -85,6 +90,8 @@ class FamiliaController extends Controller
                 }else{
                     $familia = $familia->paginate($config['limit']);
                 }
+                if($idUltimaEtapa)
+                    $completos = $familia->where('etapa','=',$idUltimaEtapa)->count();
                 $familia_totais->todos = $fm->count();
                 $familia_totais->esteMes = $fm->whereYear('created_at', '=', $ano)->whereMonth('created_at','=',$mes)->count();
                 $familia_totais->idoso = $fm->where('idoso','=','s')->count();
@@ -92,6 +99,10 @@ class FamiliaController extends Controller
 
         }else{
             $fm = $familia;
+            if($idUltimaEtapa){
+                $completos = $countFam->where('etapa','=',$idUltimaEtapa)->count();
+                //$completos = Familia::where('excluido','=','n')->where('deletado','=','n')->orderBy('id',$config['order'])->where('etapa','=',$idUltimaEtapa)->count();
+            }
             if($config['limit']=='todos'){
                 $familia = $familia->get();
             }else{
@@ -101,15 +112,48 @@ class FamiliaController extends Controller
             $familia_totais->esteMes = $fm->whereYear('created_at', '=', $ano)->whereMonth('created_at','=',$mes)->count();
             $familia_totais->idoso = $fm->where('idoso','=','s')->count();
             $familia_totais->criancas = $fm->where('crianca_adolescente','=','s')->count();
+
+
         }
-        //dd($familia_totais);
+        $progresso = [];
+        if($etapas){
+            foreach ($etapas as $key => $value) {
+                $progresso[$key]['label'] = $value['nome'];
+                $progresso[$key]['total'] = Familia::where('etapa','=',$value['id'])->where('excluido','=','n')->where('deletado','=','n')->count();
+                $progresso[$key]['geral'] = $familia_totais->todos;
+                if($progresso[$key]['total']>0){
+                    $porceto = round($progresso[$key]['total']*100/$progresso[$key]['geral'],2);
+                }else{
+                    $porceto = 0;
+                }
+                $progresso[$key]['porcento'] = $porceto;
+                $progresso[$key]['color'] = $this->colorPorcento($porceto);
+            }
+        }
+
+        $familia_totais->completos = $completos;
         $ret['familia'] = $familia;
         $ret['familia_totais'] = $familia_totais;
         $ret['arr_titulo'] = $arr_titulo;
         $ret['campos'] = $campos;
         $ret['config'] = $config;
         $ret['tituloTabela'] = $tituloTabela;
-        //dd($ret);
+        $ret['progresso'] = $progresso;
+        $ret['link_completos'] = route('familias.index').'?filter[etapa]='.$idUltimaEtapa;
+        $ret['link_idosos'] = route('familias.index').'?filter[idoso]=s';
+        return $ret;
+    }
+    public function colorPorcento($val=0){
+        $ret = 'bg-danger';
+        if($val<=25){
+            $ret = 'bg-danger';
+        }elseif($val > 25 && $val <= 50){
+            $ret = 'bg-warning';
+        }elseif($val > 50 && $val <= 85){
+            $ret = 'bg-primary';
+        }elseif($val > 85){
+            $ret = 'bg-success';
+        }
         return $ret;
     }
     public function index(User $user)
@@ -153,8 +197,9 @@ class FamiliaController extends Controller
         $escolaridade = new EscolaridadeController($user);
         $estadocivil = new EstadocivilController($user);
         return [
+            'id'=>['label'=>'Id','active'=>true,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'3','placeholder'=>'opcional'],
             'loteamento'=>[
-                'label'=>'Bairro ou Loteamento*',
+                'label'=>'Bairro ou distrito*',
                 'active'=>true,
                 'type'=>'selector',
                 'data_selector'=>[
@@ -186,7 +231,6 @@ class FamiliaController extends Controller
                 'event'=>'',
                 'tam'=>'6',
             ],
-            'id'=>['label'=>'Id','active'=>true,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'3','placeholder'=>'opcional'],
             'area_alvo'=>['label'=>'Área Alvo*','active'=>true,'type'=>'tel','exibe_busca'=>'d-block','event'=>'','tam'=>'2','placeholder'=>'opcional'],
             //'matricula'=>['label'=>'Matricula','active'=>true,'type'=>'text','exibe_busca'=>'d-block','event'=>''],
             'quadra'=>['label'=>'Quadra*','active'=>true,'type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
@@ -239,7 +283,7 @@ class FamiliaController extends Controller
             'bcp_bolsa_familia'=>['label'=>'BPC ou Bolsa Família','active'=>true,'type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'4'],
             'renda_familiar'=>['label'=>'Renda Familias','active'=>true,'type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'4','class'=>'moeda'],
             'doc_imovel'=>['label'=>'Doc Imóvel','active'=>true,'type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'12'],
-            'obs'=>['label'=>'Observação','active'=>true,'type'=>'textarea','exibe_busca'=>'d-block','event'=>'','rows'=>'4','cols'=>'80'],
+            'obs'=>['label'=>'Observação','active'=>true,'type'=>'textarea','exibe_busca'=>'d-block','event'=>'','rows'=>'4','cols'=>'80','tam'=>'12'],
         ];
     }
     public function create(User $user)
