@@ -488,17 +488,41 @@ $config['menu'] = [
           'icon' => 'fa fa-copy',
           'submenu'=>[
                 [
-                    'text' => 'Novo cadastro',
+                    'text' => 'Novo família',
                     'url'  => 'familias/create',
                     'icon' => 'fas fa-fw fa-plus',
                     'can'  => 'is_admin',
                 ],
                 [
-                    'text' => 'Todos cadastros',
+                    'text' => 'Todas familias',
                     'url'  => 'familias',
                     'icon' => 'fa fa-list',
                     'can'  => 'is_admin',
-                ]
+                ],
+                [
+                    'text' => 'Bairros',
+                    'url'  => 'bairros',
+                    'icon' => 'fa fa-list',
+                    'can'  => 'is_admin',
+                ],
+                [
+                    'text' => 'Etapas',
+                    'url'  => 'etapas',
+                    'icon' => 'fa fa-list',
+                    'can'  => 'is_admin',
+                ],
+                [
+                    'text' => 'Escolaridade',
+                    'url'  => 'escolaridade',
+                    'icon' => 'fa fa-list',
+                    'can'  => 'is_admin',
+                ],
+                [
+                    'text' => 'Estado civil',
+                    'url'  => 'estado-civil',
+                    'icon' => 'fa fa-list',
+                    'can'  => 'is_admin',
+                ],
             ],
       ],
       [

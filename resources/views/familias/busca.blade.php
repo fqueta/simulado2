@@ -14,6 +14,12 @@
                     @if (isset($campos_tabela))
                         @foreach ($campos_tabela as $kbu=>$vbu)
                             @if ($vbu['active'])
+                                @php
+                                    if($vbu['type']!='text'){
+                                        $vbu['type'] = 'text';
+                                    }
+                                    $vbu['tam'] = 3;
+                                @endphp
                                 {{App\Qlib\Qlib::qForm([
                                     'type'=>isset($vbu['type'])?$vbu['type']:'text',
                                     'campo'=>'filter['.$kbu.']',

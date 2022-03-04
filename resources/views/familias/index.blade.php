@@ -84,7 +84,13 @@
         </div>
         <div class="card-body">
             <div class="table-responsive">
-                @include('familias.table')
+                {{
+                    App\Qlib\Qlib::listaTabela([
+                    'campos_tabela'=>$campos_tabela,
+                    'config'=>$config,
+                    'dados'=>$dados,
+                    'routa'=>$routa,
+                ])}}
             </div>
         </div>
         <div class="card-footer d-print-none">

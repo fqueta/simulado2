@@ -1,7 +1,7 @@
 @if (isset($config['type']))
     @if ($config['type']=='select')
         @if (isset($config['arr_opc']))
-        <div class="form-group col-{{$config['col']}}-{{$config['tam']}} {{$config['class_div']}}">
+        <div class="form-group col-{{$config['col']}}-{{$config['tam']}} {{$config['class_div']}}" div-id="{{$config['campo']}}">
             @if ($config['label'])
                  <label for="{{$config['campo']}}">{{$config['label']}}</label>
             @endif
@@ -18,6 +18,28 @@
             @enderror
         </div>
         @endif
+    @elseif ($config['type']=='selector')
+        @if (isset($config['arr_opc']))
+            <div class="form-group col-{{$config['col']}}-{{$config['tam']}} {{$config['class_div']}}" div-id="{{$config['campo']}}">
+                @if ($config['label'])
+                    <label for="{{$config['campo']}}">{{$config['label']}}</label>
+                @endif
+                <select name="{{$config['campo']}}" {{$config['event']}} data-selector="{{App\Qlib\Qlib::encodeArray($config['data_selector'])}}" selector-event id="sele-{{$config['campo']}} @error($config['campo']) is-invalid @enderror" class="form-control custom-select selectpicker {{$config['class']}}">
+                    @if ($config['option_select'])
+                        <option value=""> {{$config['label_option_select']}} </option>
+                    @endif
+                    <option value="cad"> Cadastrar {{$config['label']}}</option>
+                    <option value="" disabled>--------------</option>
+
+                    @foreach ($config['arr_opc'] as $k=>$v)
+                        <option value="{{$k}}" @if(isset($config['value']) && $config['value'] == $k) selected @endif>{{$v}}</option>
+                    @endforeach
+                </select>
+                @error($config['campo'])
+                <div class="alert alert-danger">{{ $message }}</div>
+                @enderror
+            </div>
+        @endif
     @elseif ($config['type']=='radio')
         <div class="form-group col-{{$config['col']}}-{{$config['tam']}} {{$config['class_div']}} @error($config['campo']) is-invalid @enderror">
             <div class="btn-group" data-toggle="buttons">
@@ -32,6 +54,16 @@
                 @endforeach
             </div>
         </div>
+    @elseif ($config['type']=='hidden')
+        <div class="form-group col-{{$config['col']}}-{{$config['tam']}} {{$config['class_div']}} d-none" div-id="{{$config['campo']}}" >
+            @if ($config['label'])
+                <label for="{{$config['campo']}}">{{$config['label']}}</label>
+            @endif
+            <input type="{{$config['type']}}" class="form-control @error($config['campo']) is-invalid @enderror {{$config['class']}}" id="inp-{{$config['campo']}}" name="{{$config['campo']}}" aria-describedby="{{$config['campo']}}" placeholder="{{$config['placeholder']}}" value="@if(isset($config['value'])){{$config['value']}}@elseif($config['ac']=='cad'){{old($config['campo'])}}@endif" {{$config['event']}} />
+            @error($config['campo'])
+                <div class="alert alert-danger">{{ $message }}</div>
+            @enderror
+        </div>
     @elseif ($config['type']=='chave_checkbox')
         <!--config['checked'] é o gravado no bando do dedos e o value é o valor para ficar checado-->
         <div class="form-group col-{{$config['col']}}-{{$config['tam']}}">
@@ -42,6 +74,14 @@
             @error($config['campo'])
             <div class="alert alert-danger">{{ $message }}</div>
             @enderror
+        </div>
+    @elseif ($config['type']=='textarea')
+        <!--config['checked'] é o gravado no bando do dedos e o value é o valor para ficar checado-->
+        <div class="col-{{$config['col']}}-{{$config['tam']}} {{$config['class_div']}}" div-id="{{$config['campo']}}">
+            <div class="form-group">
+            <label for="{{$config['campo']}}">{{$config['label']}}</label><br>
+            <textarea name="{{$config['campo']}}" class="form-control @error($config['campo']) is-invalid @enderror {{$config['class']}}" rows="{{@$config['rows']}}" cols="{{@$config['cols']}}">@if(isset($config['value'])){{$config['value']}}@elseif($config['ac']=='cad'){{old($config['campo'])}}@endif</textarea>
+            </div>
         </div>
     @else
     <div class="form-group col-{{$config['col']}}-{{$config['tam']}} {{$config['class_div']}}" div-id="{{$config['campo']}}" >

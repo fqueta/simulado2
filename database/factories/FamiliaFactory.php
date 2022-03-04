@@ -18,9 +18,9 @@ class FamiliaFactory extends Factory
         return [
             'token'=>uniqid(),
             'area_alvo' => $this->getArea(),
+            'etapa'=> $this->getData('etapa'),
             'loteamento'=> $this->getData('loteamento'),
             'id_loteamento'=>0,
-            'matricula'=>$this->getData('matricula'),
             'quadra'=> $this->getData('quadra'),
             'lote'=> $this->getData('quadra'),
             'nome_completo'=>$this->faker->name($gender),
@@ -60,15 +60,15 @@ class FamiliaFactory extends Factory
             if($campo=='quadra'){
                 $arr = ['70.1','70.4','80.6'];
             }elseif($campo=='loteamento'){
-                $arr = ['Camponesa e adjacências','Camponesa e adjacências2','Camponesa e adjacências3'];
+                $arr = ['1','2','3','4'];
+            }elseif($campo=='etapa'){
+                $arr = ['1','2','3','4'];
             }elseif($campo=='idoso'||$campo=='crianca_adolescente'){
                 $arr = ['s','n'];
             }elseif($campo=='renda_familiar'){
                 $arr = ['1202.00','2150.56','3300.48'];
             }elseif($campo=='doc_imovel'){
                 $arr = ['Escritura Pública de Contrato de Aforamento','Não','Sim'];
-            }elseif($campo=='matricula'){
-                $arr = ['625','628','745'];
             }elseif($campo=='situacao_profissional'){
                 $arr = ['Aposentado(a)','Profissional liberal','Domestico(a)'];
             }elseif($campo=='obs'){

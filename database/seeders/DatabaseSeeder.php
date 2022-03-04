@@ -20,6 +20,8 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             escolaridadeSeeder::class,
             estadocivilSeeder::class,
+            bairroSeeder::class,
+            etapaSeeder::class,
         ]);
 
     }

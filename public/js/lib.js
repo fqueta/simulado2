@@ -44,6 +44,28 @@ function uniqid(prefix, more_entropy) {
 function lib_urlAtual(){
   return window.location.href;
 }
+function goToByScroll2(seletor) {
+    // Remove "link" from the ID
+    seletor = seletor.replace("link", "");
+    // Scroll
+	$('html,body').animate({
+        scrollTop: $(seletor).offset().top
+    }, 'slow');
+}
+function redirect_blank(url) {
+  var a = document.createElement('a');
+  a.target="_blank";
+  a.href=url;
+  a.click();
+}
+function encodeArray(arr){
+	var encode = JSON.stringify(btoa(arr));
+	return encode
+}
+function decodeArray(arr){
+	var decode = JSON.parse(atob(arr));
+	return decode
+}
 function __translate(val,val2){
 	return val;
 }
@@ -771,6 +793,42 @@ function submitFormulario(objForm,funCall,funError){
         }
     });
 }
+function submitFormularioCSRF(objForm,funCall,funError){
+    if(typeof funCall == 'undefined'){
+        funCall = function(res){
+            console.log(res);
+        }
+    }
+    if(typeof funError == 'undefined'){
+        funError = function(res){
+            lib_funError(res);
+        }
+    }
+    var route = objForm.attr('action');
+    console.log(route);
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': jQuery('meta[name="csrf-token"]').attr('content')
+        }
+    });
+    $.ajax({
+        type: 'POST',
+        url: route,
+        data: objForm.serialize()+'&ajax=s',
+        dataType: 'json',
+        success: function (data) {
+            funCall(data);
+        },
+        error: function (data) {
+            if(data.responseJSON.errors){
+                funError(data.responseJSON.errors);
+                console.log(data.responseJSON.errors);
+            }else{
+                lib_formatMensagem('.mens','Erro','danger');
+            }
+        }
+    });
+}
 function lib_funError(res){
     var mens = '';
     Object.entries(res).forEach(([key, value]) => {
@@ -790,4 +848,88 @@ function lib_funError(res){
     });
     lib_formatMensagem('.mens',mens,'danger');
 
+}
+function modalGeral(id,titulo,conteudo){
+    var m = $(id);
+    m.modal('show');
+    m.find('.modal-title').html(titulo);
+    m.find('.conteudo').html(conteudo);
+
+}
+function initSelector(obj){
+    if(obj.val()!='cad'){
+        return
+    }
+    var d = decodeArray(obj.data('selector'));
+    if(d.campos){
+        var f = qFormCampos(d.campos);
+        if(f){
+            var tf = '<form id="{id_form}" action="{action}"><div class="row"><div class="col-md-12 mens"></div>{conte}</div></form>';
+            var b = '<button type="button" class="btn btn-primary" f-submit>Salvar <i class="fas fa-chevron-circle-right"></i></button>';
+            var m = '#modal-geral';
+            tf = tf.replace('{id_form}',d.id_form);
+            tf = tf.replace('{conte}',f);
+            tf = tf.replace('{action}',d.action);
+            modalGeral(m,'Cadastrar '+d.label,tf);
+            //obj.find('option').attr('selected',false);
+            obj.find('option[value=\'\']:first').attr('selected','selected');
+            $('[f-submit]').remove();
+            $(b).insertAfter(m+' .modal-footer button');
+            $('[f-submit]').on('click',function(){
+
+                submitFormularioCSRF($('#'+d.id_form),function(res){
+                    if(res.mens){
+                        lib_formatMensagem('.mens',res.mens,res.color);
+                    }
+                    if(res.exec){
+                        $(m).modal('hide');
+                        obj.append($('<option>', {
+                            value: res.idCad,
+                            text: res.dados[d.campo_bus]
+                        }));
+                        obj.find('option[value='+res.idCad+']').attr('selected','selected');
+                    }
+                });
+            });
+        }
+        //$('.mens').html(campo_nome);
+    }
+    console.log(d);
+}
+function qFormCampos(config){
+    if(typeof config == 'undefined'){
+        return false;
+    }
+    const tl = '<label for="{campo}">{label}</label>';
+    var tema = {
+        text : '<div class="form-group col-{col}-{tam} {class_div}" div-id="{campo}" >{label}<input type="{type}" class="form-control {class}" id="inp-{campo}" name="{campo}" aria-describedby="{campo}" placeholder="{placeholder}" value="{value}" {event} /></div>',
+        number : '<div class="form-group col-{col}-{tam} {class_div}" div-id="{campo}" >{label}<input type="{type}" class="form-control {class}" id="inp-{campo}" name="{campo}" aria-describedby="{campo}" placeholder="{placeholder}" value="{value}" {event} /></div>',
+        hidden : '<div class="form-group col-{col}-{tam} {class_div} d-none" div-id="{campo}" >{label}<input type="{type}" class="form-control {class}" id="inp-{campo}" name="{campo}" aria-describedby="{campo}" placeholder="{placeholder}" value="{value}" {event} /></div>',
+        chave_checkbox : '<div class="form-group col-{col}-{tam}"><div class="custom-control custom-switch  {class}"><input type="checkbox" class="custom-control-input" {checked} value="{value}"  name="{campo}" id="{campo}"><label class="custom-control-label" for="{campo}">{label}</label></div></div>',
+    };
+    var r = '';
+    var ret = '';
+    if(Object.entries(config).length>0){
+        Object.entries(config).forEach(([key, v]) => {
+            if(v.type!='hidder' && v.active==true){
+                var type = v.type;
+                r += tema[type].replaceAll('{type}',v.type);
+                var label = tl.replaceAll('{campo}',key);
+                label.replaceAll('{label}',);
+                var value = v.value?v.value:'';
+                var classe = v.class?v.class:'';
+                var placeholder = v.placeholder?v.placeholder:'';
+                r = r.replaceAll('{campo}',key);
+                r = r.replaceAll('{label}',v.label);
+                r = r.replaceAll('{value}',value);
+                r = r.replaceAll('{tam}',v.tam);
+                r = r.replaceAll('{col}','md');
+                r = r.replaceAll('{class}',classe);
+                r = r.replaceAll('{placeholder}',v.placeholder);
+            }
+        });
+    }
+    ret = r;
+
+    return ret;
 }

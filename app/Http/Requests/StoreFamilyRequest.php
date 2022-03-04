@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Http\Requests;
+
+use App\Rules\familyRules;
 use App\Rules\FullName;
 use App\Rules\RightCpf;
 use Illuminate\Foundation\Http\FormRequest;
@@ -14,14 +16,15 @@ class StoreFamilyRequest extends FormRequest
     public function rules()
     {
         return [
+            'loteamento'=>['required',new familyRules],
+            'etapa'=>['required',new familyRules],
             'area_alvo'=>['required'],
-            'loteamento'=>['required'],
-            'matricula'=>['required'],
+            //'matricula'=>['required'],
             'quadra'=>['required'],
             'lote'=>['required'],
             'nome_completo'=>[new FullName],
-            'escolaridade'=>'required',
-            'estado_civil'=>'required',
+            //'escolaridade'=>['required'],
+            //'estado_civil'=>'required',
             'cpf'=>[new RightCpf],
         ];
     }

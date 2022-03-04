@@ -23,7 +23,7 @@
                 @if (isset($campos_tabela) && is_array($campos_tabela))
                     @foreach ($campos_tabela as $kd=>$vd)
                         @if (isset($vd['label']) && $vd['active'])
-                            @if (isset($vd['type']) && $vd['type']=='select')
+                            @if (isset($vd['type']) && ($vd['type']=='select' || $vd['type']=='selector'))
                                 <td>{{$vd['arr_opc'][$familia->$kd]}}</td>
                             @else
                                 <td>{{$familia->$kd}}</td>

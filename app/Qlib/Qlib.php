@@ -218,5 +218,20 @@ class Qlib
             return false;
         }
     }
-
+    static function formulario($config=false){
+        if($config['campos']){
+            $view = 'qlib.formulario';
+            return view($view, ['conf'=>$config]);
+        }else{
+            return false;
+        }
+    }
+    static function listaTabela($config=false){
+        if($config['campos_tabela']){
+            $view = 'qlib.listaTabela';
+            return view($view, ['conf'=>$config]);
+        }else{
+            return false;
+        }
+    }
 }

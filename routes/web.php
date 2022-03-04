@@ -4,10 +4,13 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\GerenciarGrupo;
 use App\Http\Controllers\GerenciarUsuarios;
-use App\Http\Controllers\GerenciarRelatorios;
 use App\Http\Controllers\FamiliaController;
+use App\Http\Controllers\BairroController;
 use App\Http\Controllers\TesteController;
 use App\Http\Controllers\UploadController;
+use App\Http\Controllers\EtapaController;
+use App\Http\Controllers\EscolaridadeController;
+use App\Http\Controllers\EstadocivilController;
 use Illuminate\Support\Facades\Auth;
 
 /*
@@ -38,31 +41,59 @@ Route::prefix('users')->group(function(){
 });
 Route::prefix('familias')->group(function(){
     Route::get('/',[FamiliaController::class,'index'])->name('familias.index');
-
-    Route::get('/ajax',[FamiliaController::class,'paginacaoAjax'])->name('familias.ajax');
-    Route::get('/lista.ajax',function(){
-        return view('users.index_ajax');
-    });
-
     Route::get('/create',[FamiliaController::class,'create'])->name('familias.create');
     Route::post('/',[FamiliaController::class,'store'])->name('familias.store');
     Route::get('/{id}/show',[FamiliaController::class,'show'])->name('familias.show');
     Route::get('/{id}/edit',[FamiliaController::class,'edit'])->name('familias.edit');
     Route::put('/{id}',[FamiliaController::class,'update'])->where('id', '[0-9]+')->name('familias.update');
-    Route::post('/{id}',[FamiliaController::class,'update'])->where('id', '[0-9]+')->name('familias.update-ajax');
     Route::delete('/{id}',[FamiliaController::class,'destroy'])->where('id', '[0-9]+')->name('familias.destroy');
     Route::get('export/all', [FamiliaController::class, 'exportAll'])->name('familias.export_all');
     Route::get('export/filter', [FamiliaController::class, 'exportFilter'])->name('familias.export_filter');
 });
+Route::prefix('bairros')->group(function(){
+    Route::get('/',[BairroController::class,'index'])->name('bairros.index');
+    Route::get('/create',[BairroController::class,'create'])->name('bairros.create');
+    Route::post('/',[BairroController::class,'store'])->name('bairros.store');
+    Route::get('/{id}/show',[BairroController::class,'show'])->name('bairros.show');
+    Route::get('/{id}/edit',[BairroController::class,'edit'])->name('bairros.edit');
+    Route::put('/{id}',[BairroController::class,'update'])->where('id', '[0-9]+')->name('bairros.update');
+    Route::delete('/{id}',[BairroController::class,'destroy'])->where('id', '[0-9]+')->name('bairros.destroy');
+    Route::get('export/all', [BairroController::class, 'exportAll'])->name('bairros.export_all');
+    Route::get('export/filter', [BairroController::class, 'exportFilter'])->name('bairros.export_filter');
+});
 
+Route::prefix('escolaridade')->group(function(){
+    Route::get('/',[EscolaridadeController::class,'index'])->name('escolaridades.index');
+    Route::get('/create',[EscolaridadeController::class,'create'])->name('escolaridades.create');
+    Route::post('/',[EscolaridadeController::class,'store'])->name('escolaridades.store');
+    Route::get('/{id}/show',[EscolaridadeController::class,'show'])->name('escolaridades.show');
+    Route::get('/{id}/edit',[EscolaridadeController::class,'edit'])->name('escolaridades.edit');
+    Route::put('/{id}',[EscolaridadeController::class,'update'])->where('id', '[0-9]+')->name('escolaridades.update');
+    Route::post('/{id}',[EscolaridadeController::class,'update'])->where('id', '[0-9]+')->name('escolaridades.update-ajax');
+    Route::delete('/{id}',[EscolaridadeController::class,'destroy'])->where('id', '[0-9]+')->name('escolaridades.destroy');
+});
+Route::prefix('estado-civil')->group(function(){
+    Route::get('/',[EstadocivilController::class,'index'])->name('estadocivils.index');
+    Route::get('/create',[EstadocivilController::class,'create'])->name('estadocivils.create');
+    Route::post('/',[EstadocivilController::class,'store'])->name('estadocivils.store');
+    Route::get('/{id}/show',[EstadocivilController::class,'show'])->name('estadocivils.show');
+    Route::get('/{id}/edit',[EstadocivilController::class,'edit'])->name('estadocivils.edit');
+    Route::put('/{id}',[EstadocivilController::class,'update'])->where('id', '[0-9]+')->name('estadocivils.update');
+    Route::post('/{id}',[EstadocivilController::class,'update'])->where('id', '[0-9]+')->name('estadocivils.update-ajax');
+    Route::delete('/{id}',[EstadocivilController::class,'destroy'])->where('id', '[0-9]+')->name('estadocivils.destroy');
+});
+Route::prefix('etapas')->group(function(){
+    Route::get('/',[EtapaController::class,'index'])->name('etapas.index');
+    Route::get('/create',[EtapaController::class,'create'])->name('etapas.create');
+    Route::post('/',[EtapaController::class,'store'])->name('etapas.store');
+    Route::get('/{id}/show',[EtapaController::class,'show'])->name('etapas.show');
+    Route::get('/{id}/edit',[EtapaController::class,'edit'])->name('etapas.edit');
+    Route::put('/{id}',[EtapaController::class,'update'])->where('id', '[0-9]+')->name('etapas.update');
+    Route::post('/{id}',[EtapaController::class,'update'])->where('id', '[0-9]+')->name('etapas.update-ajax');
+    Route::delete('/{id}',[EtapaController::class,'destroy'])->where('id', '[0-9]+')->name('etapas.destroy');
+});
 Route::prefix('uploads')->group(function(){
     Route::get('/',[uploadController::class,'index'])->name('uploads.index');
-
-    Route::get('/ajax',[uploadController::class,'paginacaoAjax'])->name('uploads.ajax');
-    Route::get('/lista.ajax',function(){
-        return view('users.index_ajax');
-    });
-
     Route::get('/create',[UploadController::class,'create'])->name('uploads.create');
     Route::post('/',[UploadController::class,'store'])->name('uploads.store');
     Route::get('/{id}/show',[UploadController::class,'show'])->name('uploads.show');
@@ -73,7 +104,6 @@ Route::prefix('uploads')->group(function(){
     Route::get('export/all', [UploadController::class, 'exportAll'])->name('uploads.export_all');
     Route::get('export/filter', [UploadController::class, 'exportFilter'])->name('uploads.export_filter');
 });
-
 Route::fallback(function () {
     return view('erro404');
 });

@@ -45,7 +45,7 @@
                     @foreach ($campos_tabela as $kd=>$vd)
                         @if (isset($vd['label']) && $vd['active'])
                             @if (isset($vd['type']) && $vd['type']=='select')
-                                <td>{{$vd['arr_opc'][$familia->$kd]}}</td>
+                                <td>{{@$vd['arr_opc'][$familia->$kd]}}</td>
                             @else
                                 <td>{{$familia->$kd}}</td>
                             @endif

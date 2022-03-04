@@ -18,6 +18,13 @@ class CreateEscolaridadesTable extends Migration
             $table->timestamps();
             $table->string('nome','150')->nullable();
             $table->string('token','60')->nullable();
+            $table->enum('ativo',['s','n']);
+            $table->integer('autor')->nullable();
+            $table->longText('obs')->nullable();
+            $table->enum('excluido',['n','s']);
+            $table->text('reg_excluido')->nullable();
+            $table->enum('deletado',['n','s']);
+            $table->text('reg_deletado')->nullable();
         });
     }
 

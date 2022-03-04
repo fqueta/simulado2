@@ -21,7 +21,16 @@
                 </div>
             </div>
             <div class="card-body">
-                @include('familias.frm')
+                <div class="row">
+                    <div class="col-md-12 matricula {{@$config['display_matricula']}}">
+                        <label for="matricula">Matricula:</label> <span>{{@$value['matricula']}}</span>
+                    </div>
+                </div>
+                {{App\Qlib\Qlib::formulario([
+                    'campos'=>$campos,
+                    'config'=>$config,
+                    'value'=>$value,
+                ])}}
             </div>
         </div>
     </div>
@@ -38,7 +47,7 @@
             <div class="card-body">
                 {{App\Qlib\Qlib::gerUploadAquivos([
                     'pasta'=>'familias/'.date('Y').'/'.date('m'),
-                    'token_produto'=>$familia['token'],
+                    'token_produto'=>$value['token'],
                     'tab'=>'familias',
                     'listFiles'=>@$listFiles,
                 ])}}
@@ -65,7 +74,7 @@
           $(function(){
           $('[type="submit"]').on('click',function(e){
                 e.preventDefault();
-                submitFormulario($('#frm-familias'),function(res){
+                submitFormulario($('#{{$config['frm_id']}}'),function(res){
                     if(res.exec){
                         lib_formatMensagem('.mens',res.mens,res.color);
                     }

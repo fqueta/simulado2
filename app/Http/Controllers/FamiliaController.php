@@ -9,30 +9,31 @@ use App\Rules\FullName;
 use App\Rules\RightCpf;
 
 use stdClass;
-use App\Qlib\Qlib;
 use App\Http\Requests\StoreFamilyRequest;
+use App\Qlib\Qlib;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\URL;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Storage;
-use App\Exports\UsersExport;
-use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\FamiliasExport;
 use App\Exports\FamiliasExportView;
-
-
+use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\URL;
+use App\Exports\UsersExport;
+use App\Models\Bairro;
 use DataTables;
 use Illuminate\Support\Facades\Auth;
 
 class FamiliaController extends Controller
 {
     protected $user;
+    public $routa;
+
     public function __construct(User $user)
     {
         $this->middleware('auth');
         $this->user = $user;
+        $this->routa = 'familias';
     }
     public function queryFamilias($get=false,$config=false)
     {
@@ -47,6 +48,7 @@ class FamiliaController extends Controller
         ];
 
         $familia =  Familia::where('excluido','=','n')->where('deletado','=','n')->orderBy('id',$config['order']);
+
         //$familia =  DB::table('familias')->where('excluido','=','n')->where('deletado','=','n')->orderBy('id',$config['order']);
 
         $familia_totais = new stdClass;
@@ -84,9 +86,9 @@ class FamiliaController extends Controller
                     $familia = $familia->paginate($config['limit']);
                 }
                 $familia_totais->todos = $fm->count();
+                $familia_totais->esteMes = $fm->whereYear('created_at', '=', $ano)->whereMonth('created_at','=',$mes)->count();
                 $familia_totais->idoso = $fm->where('idoso','=','s')->count();
                 $familia_totais->criancas = $fm->where('crianca_adolescente','=','s')->count();
-                $familia_totais->esteMes = $fm->whereYear('created_at', '=', $ano)->whereMonth('created_at','=',$mes)->count();
 
         }else{
             $fm = $familia;
@@ -96,10 +98,11 @@ class FamiliaController extends Controller
                 $familia = $familia->paginate($config['limit']);
             }
             $familia_totais->todos = $fm->count();
+            $familia_totais->esteMes = $fm->whereYear('created_at', '=', $ano)->whereMonth('created_at','=',$mes)->count();
             $familia_totais->idoso = $fm->where('idoso','=','s')->count();
             $familia_totais->criancas = $fm->where('crianca_adolescente','=','s')->count();
-            $familia_totais->esteMes = $fm->whereYear('created_at', '=', $ano)->whereMonth('created_at','=',$mes)->count();
         }
+        //dd($familia_totais);
         $ret['familia'] = $familia;
         $ret['familia_totais'] = $familia_totais;
         $ret['arr_titulo'] = $arr_titulo;
@@ -116,8 +119,9 @@ class FamiliaController extends Controller
         $titulo = $title;
         $queryFamilias = $this->queryFamilias($_GET);
         $queryFamilias['config']['exibe'] = 'html';
-
-        return view('familias.index',[
+        $routa = $this->routa;
+        return view($routa.'.index',[
+            'dados'=>$queryFamilias['familia'],
             'familias'=>$queryFamilias['familia'],
             'title'=>$title,
             'titulo'=>$titulo,
@@ -126,6 +130,7 @@ class FamiliaController extends Controller
             'titulo_tabela'=>$queryFamilias['tituloTabela'],
             'arr_titulo'=>$queryFamilias['arr_titulo'],
             'config'=>$queryFamilias['config'],
+            'routa'=>$routa,
             'i'=>0,
         ]);
     }
@@ -142,28 +147,96 @@ class FamiliaController extends Controller
         return Excel::download(new FamiliasExportView, 'Familias_'.date('d_m_Y').'.xlsx');
     }
     public function campos(){
+        $user = Auth::user();
+        $bairro = new BairroController($user);
+        $etapa = new EtapaController($user);
+        $escolaridade = new EscolaridadeController($user);
+        $estadocivil = new EstadocivilController($user);
         return [
-            'id'=>['label'=>'Id','active'=>true,'type'=>'number','exibe_busca'=>'d-block','event'=>''],
-            'area_alvo'=>['label'=>'Área Alvo','active'=>true,'type'=>'text','exibe_busca'=>'d-block','event'=>''],
-            'loteamento'=>['label'=>'Loteamanto','active'=>true,'type'=>'text','exibe_busca'=>'d-block','event'=>''],
-            'matricula'=>['label'=>'Matricula','active'=>true,'type'=>'text','exibe_busca'=>'d-block','event'=>''],
-            'quadra'=>['label'=>'Quadra','active'=>true,'type'=>'text','exibe_busca'=>'d-block','event'=>''],
-            'lote'=>['label'=>'Lote','active'=>true,'type'=>'text','exibe_busca'=>'d-block','event'=>''],
-            'nome_completo'=>['label'=>'Proprietário','active'=>true,'type'=>'text','exibe_busca'=>'d-block','event'=>''],
-            'cpf'=>['label'=>'CPF proprietário','active'=>true,'type'=>'text','exibe_busca'=>'d-block','event'=>''],
-            'nome_conjuge'=>['label'=>'Nome do Cônjuge','active'=>true,'type'=>'text','exibe_busca'=>'d-block','event'=>''],
-            'cpf_conjuge'=>['label'=>'CPF do Cônjuge','active'=>true,'type'=>'text','exibe_busca'=>'d-block','event'=>''],
-            'telefone'=>['label'=>'Telefone','active'=>true,'type'=>'text','exibe_busca'=>'d-block','event'=>'onblur=mask(this,clientes_mascaraTelefone); onkeypress=mask(this,clientes_mascaraTelefone);'],
-            'escolaridade'=>['label'=>'Escolaridade','active'=>true,'type'=>'select','arr_opc'=>Qlib::sql_array("SELECT id,nome FROM escolaridades",'nome','id'),'exibe_busca'=>'d-block','event'=>''],
-            'estado_civil'=>['label'=>'Estado Civil','active'=>true,'type'=>'select','arr_opc'=>Qlib::sql_array("SELECT id,nome FROM estadocivils",'nome','id'),'exibe_busca'=>'d-block','event'=>''],
-            'situacao_proficional'=>['label'=>'Situação Proficional','active'=>true,'exibe_busca'=>'d-block','event'=>''],
-            'qtd_membros'=>['label'=>'Qtd. Membros','active'=>true,'type'=>'text','exibe_busca'=>'d-block','event'=>''],
-            'idoso'=>['label'=>'Idoso','active'=>true,'type'=>'text','exibe_busca'=>'d-block','event'=>''],
-            'crianca_adolescente'=>['label'=>'Criança e Adolescente','active'=>true,'exibe_busca'=>'d-block','event'=>''],
-            'bcp_bolsa_familia'=>['label'=>'BPC ou Bolsa Família','active'=>true,'type'=>'text','exibe_busca'=>'d-block','event'=>''],
-            'renda_familiar'=>['label'=>'Renda Familias','active'=>true,'type'=>'text','exibe_busca'=>'d-block','event'=>''],
-            'doc_imovel'=>['label'=>'Doc Imóvel','active'=>true,'type'=>'text','exibe_busca'=>'d-block','event'=>''],
-            'obs'=>['label'=>'Observação','active'=>true,'type'=>'text','exibe_busca'=>'d-block','event'=>''],
+            'loteamento'=>[
+                'label'=>'Bairro ou Loteamento*',
+                'active'=>true,
+                'type'=>'selector',
+                'data_selector'=>[
+                    'campos'=>$bairro->campos(),
+                    'route_index'=>route('bairros.index'),
+                    'id_form'=>'frm-bairros',
+                    'action'=>route('bairros.store'),
+                    'campo_id'=>'id',
+                    'campo_bus'=>'nome',
+                    'label'=>'Bairro',
+                ],'arr_opc'=>Qlib::sql_array("SELECT id,nome FROM bairros",'nome','id'),'exibe_busca'=>'d-block',
+                'event'=>'',
+                'tam'=>'12'
+            ],
+            'etapa'=>[
+                'label'=>'Etapa de cadastro*',
+                'active'=>true,
+                'type'=>'selector',
+                'data_selector'=>[
+                    'campos'=>$etapa->campos(),
+                    'route_index'=>route('etapas.index'),
+                    'id_form'=>'frm-etapas',
+                    'action'=>route('etapas.store'),
+                    'campo_id'=>'id',
+                    'campo_bus'=>'nome',
+                    'label'=>'Etapa',
+                ],'arr_opc'=>Qlib::sql_array("SELECT id,nome FROM etapas",'nome','id'),'exibe_busca'=>'d-block',
+                'event'=>'',
+                'tam'=>'6',
+            ],
+            'id'=>['label'=>'Id','active'=>true,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'3','placeholder'=>'opcional'],
+            'area_alvo'=>['label'=>'Área Alvo*','active'=>true,'type'=>'tel','exibe_busca'=>'d-block','event'=>'','tam'=>'2','placeholder'=>'opcional'],
+            //'matricula'=>['label'=>'Matricula','active'=>true,'type'=>'text','exibe_busca'=>'d-block','event'=>''],
+            'quadra'=>['label'=>'Quadra*','active'=>true,'type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
+            'lote'=>['label'=>'Lote*','active'=>true,'type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
+            'nome_completo'=>['label'=>'Proprietário','active'=>true,'type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'6'],
+            'cpf'=>['label'=>'CPF proprietário','active'=>true,'type'=>'tel','exibe_busca'=>'d-block','event'=>'','tam'=>'6'],
+            'nome_conjuge'=>['label'=>'Nome do Cônjuge','active'=>true,'type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'6'],
+            'cpf_conjuge'=>['label'=>'CPF do Cônjuge','active'=>true,'type'=>'tel','exibe_busca'=>'d-block','event'=>'','tam'=>'6'],
+            'telefone'=>['label'=>'Telefone','active'=>true,'type'=>'tel','tam'=>'3','exibe_busca'=>'d-block','event'=>'onblur=mask(this,clientes_mascaraTelefone); onkeypress=mask(this,clientes_mascaraTelefone);'],
+            'escolaridade'=>[
+                'label'=>'Escolaridade',
+                'active'=>true,
+                'type'=>'selector',
+                'data_selector'=>[
+                    'campos'=>$escolaridade->campos(),
+                    'route_index'=>route('escolaridades.index'),
+                    'id_form'=>'frm-escolaridades',
+                    'action'=>route('escolaridades.store'),
+                    'campo_id'=>'id',
+                    'campo_bus'=>'nome',
+                    'label'=>'Escolaridade',
+                ],
+                'arr_opc'=>Qlib::sql_array("SELECT id,nome FROM escolaridades",'nome','id'),'exibe_busca'=>'d-block',
+                'event'=>'',
+                'tam'=>'3',
+            ],
+            'estado_civil'=>[
+                'label'=>'Estado Civil',
+                'active'=>true,
+                'type'=>'selector',
+                'data_selector'=>[
+                    'campos'=>$estadocivil->campos(),
+                    'route_index'=>route('estadocivils.index'),
+                    'id_form'=>'frm-estadocivils',
+                    'action'=>route('estadocivils.store'),
+                    'campo_id'=>'id',
+                    'campo_bus'=>'nome',
+                    'label'=>'Estado Civil',
+                ],
+                'arr_opc'=>Qlib::sql_array("SELECT id,nome FROM estadocivils",'nome','id'),'exibe_busca'=>'d-block',
+                'event'=>'',
+                'tam'=>'4',
+            ],
+            'qtd_membros'=>['label'=>'Membros','active'=>true,'type'=>'number','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
+            'idoso'=>['label'=>'Idoso','active'=>true,'type'=>'chave_checkbox','value'=>'s','exibe_busca'=>'d-none','event'=>'','tam'=>'6','arr_opc'=>['s'=>'Sim','n'=>'Não']],
+            'crianca_adolescente'=>['label'=>'Criança e Adolescente','active'=>true,'exibe_busca'=>'d-none','event'=>'','type'=>'chave_checkbox','value'=>'s','exibe_busca'=>'d-block','event'=>'','tam'=>'6','arr_opc'=>['s'=>'Sim','n'=>'Não']],
+            'situacao_profissional'=>['label'=>'Situação Profissional','type'=>'text','active'=>true,'exibe_busca'=>'d-block','event'=>'','tam'=>'4'],
+            'bcp_bolsa_familia'=>['label'=>'BPC ou Bolsa Família','active'=>true,'type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'4'],
+            'renda_familiar'=>['label'=>'Renda Familias','active'=>true,'type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'4','class'=>'moeda'],
+            'doc_imovel'=>['label'=>'Doc Imóvel','active'=>true,'type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'12'],
+            'obs'=>['label'=>'Observação','active'=>true,'type'=>'textarea','exibe_busca'=>'d-block','event'=>'','rows'=>'4','cols'=>'80'],
         ];
     }
     public function create(User $user)
@@ -172,17 +245,30 @@ class FamiliaController extends Controller
         $title = 'Cadastrar família';
         $titulo = $title;
         //$Users = Users::all();
-        $arr_user = ['ac'=>'cad'];
         //$roles = DB::select("SELECT * FROM roles ORDER BY id ASC");
         $familia = ['ac'=>'cad','token'=>uniqid()];
         $arr_escolaridade = Qlib::sql_array("SELECT id,nome FROM escolaridades ORDER BY nome ", 'nome', 'id');
         $arr_estadocivil = Qlib::sql_array("SELECT id,nome FROM estadocivils ORDER BY nome ", 'nome', 'id');
-        return view('familias.createedit',[
-            'familia'=>$familia,
+        $config = [
+            'ac'=>'cad',
+            'frm_id'=>'frm-familias',
+            'route'=>$this->routa,
+        ];
+        $value = [
+            'token'=>uniqid(),
+            'matricula'=>false,
+        ];
+        if(!$value['matricula'])
+            $config['display_matricula'] = 'd-none';
+        $campos = $this->campos();
+        return view($this->routa.'.createedit',[
+            'config'=>$config,
             'title'=>$title,
             'titulo'=>$titulo,
             'arr_escolaridade'=>$arr_escolaridade,
             'arr_estadocivil'=>$arr_estadocivil,
+            'campos'=>$campos,
+            'value'=>$value,
         ]);
     }
 
@@ -201,14 +287,14 @@ class FamiliaController extends Controller
             $dados['config'] = Qlib::lib_array_json($dados['config']);
         }
         $dados['idoso'] = isset($dados['idoso'])?$dados['idoso']:'n';
-        $dados['crianca_adolescente'] = isset($dados['crianca_adolescente'])?:'n';
+        $dados['crianca_adolescente'] = isset($dados['crianca_adolescente'])?$dados['crianca_adolescente']:'n';
+        $dados['renda_familiar'] = $dados['renda_familiar']?$dados['renda_familiar']:'0,00';
         $dados['autor'] = $userLogadon;
         $dados['token'] = uniqid();
         $renda_familiar = str_replace('R$','',$dados['renda_familiar']);
         $dados['renda_familiar'] = Qlib::precoBanco($renda_familiar);
-
         $salvar = Familia::create($dados);
-        $route = 'familias.index';
+        $route = $this->routa.'.index';
         $ret = [
             'mens'=>'Salvo com sucesso!',
             'color'=>'success',
@@ -245,25 +331,43 @@ class FamiliaController extends Controller
             $arr_escolaridade = Qlib::sql_array("SELECT id,nome FROM escolaridades ORDER BY nome ", 'nome', 'id');
             $arr_estadocivil = Qlib::sql_array("SELECT id,nome FROM estadocivils ORDER BY nome ", 'nome', 'id');
             $listFiles = false;
+            $dados[0]['renda_familiar'] = number_format($dados[0]['renda_familiar'],2,',','.');
+            $campos = $this->campos();
             if(isset($dados[0]['token'])){
                 $listFiles = _upload::where('token_produto','=',$dados[0]['token'])->get();
             }
+            $config = [
+                'ac'=>'alt',
+                'frm_id'=>'frm-familias',
+                'route'=>$this->routa,
+                'id'=>$id,
+            ];
+            if($dados[0]['loteamento']>0){
+                $bairro = Bairro::find($dados[0]['loteamento']);
+                $dados[0]['matricula'] = $bairro['matricula'];
+                //dd($dados[0]['matricula']);
+            }
+            if(!$dados[0]['matricula'])
+                $config['display_matricula'] = 'd-none';
+
             $ret = [
-                'familia'=>$dados[0],
+                'value'=>$dados[0],
+                'config'=>$config,
                 'title'=>$title,
                 'titulo'=>$titulo,
                 'arr_escolaridade'=>$arr_escolaridade,
                 'arr_estadocivil'=>$arr_estadocivil,
                 'listFiles'=>$listFiles,
+                'campos'=>$campos,
                 'exec'=>true,
             ];
 
-            return view('familias.createedit',$ret);
+            return view($this->routa.'.createedit',$ret);
         }else{
             $ret = [
                 'exec'=>false,
             ];
-            return redirect()->route('familias.index',$ret);
+            return redirect()->route($this->routa.'.index',$ret);
         }
     }
     public function update(StoreFamilyRequest $request, $id)
@@ -323,12 +427,6 @@ class FamiliaController extends Controller
         }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Familia  $familia
-     * @return \Illuminate\Http\Response
-     */
     public function destroy($id,Request $request)
     {
         $config = $request->all();
