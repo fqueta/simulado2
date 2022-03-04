@@ -121,7 +121,7 @@ class FamiliaController extends Controller
                 $progresso[$key]['label'] = $value['nome'];
                 $progresso[$key]['total'] = Familia::where('etapa','=',$value['id'])->where('excluido','=','n')->where('deletado','=','n')->count();
                 $progresso[$key]['geral'] = $familia_totais->todos;
-                if($progresso[$key]['total']>0){
+                if($progresso[$key]['total']>0 && $progresso[$key]['geral'] >0){
                     $porceto = round($progresso[$key]['total']*100/$progresso[$key]['geral'],2);
                 }else{
                     $porceto = 0;
