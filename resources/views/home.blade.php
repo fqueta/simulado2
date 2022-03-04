@@ -48,7 +48,7 @@
               <p>Cadastros completos</p>
             </div>
             <div class="icon">
-              <i class="ion ion-stats-bars"></i>
+              <i class="fa fa-check"></i>
             </div>
             <a href="{{$config['c_familias']['link_completos']}}" class="small-box-footer">Visualizar <i class="fas fa-arrow-circle-right"></i></a>
           </div>
@@ -63,13 +63,14 @@
               <p>Familias com idosos</p>
             </div>
             <div class="icon">
-              <i class="fa fa-man"></i>
+              <i class="fa fa-male"></i>
             </div>
             <a href="{{$config['c_familias']['link_idosos']}}" class="small-box-footer">Visualizar <i class="fas fa-arrow-circle-right"></i></a>
           </div>
         </div>
         <!-- ./col -->
     </div>
+
     <div class="row mb-5">
         @if (isset($config['c_familias']['progresso']))
         <div class="col-md-5">
