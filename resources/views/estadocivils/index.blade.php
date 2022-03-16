@@ -9,7 +9,7 @@
   <!--<p>Selecione os publicadores do seu familia para enviar o relatorio para o secretário</p>-->
 
   <div class="row">
-    @include('bairros.config_exibe')
+    @include('Qlib.config_exibe')
     <div class="col-md-12 mens">
     </div>
     @can('is_admin')
@@ -37,9 +37,7 @@
             @can('is_admin')
             <div class="card-tools d-flex d-print-none">
                     @include($routa.'.dropdow_actions')
-                    <a href="{{ route($routa.'.create') }}" class="btn btn-success">
-                        <i class="fa fa-plus" aria-hidden="true"></i> Cadastrar
-                    </a>
+                    @include('Qlib.dropdow_acaomassa')
             </div>
             @endcan
         </div>

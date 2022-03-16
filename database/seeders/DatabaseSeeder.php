@@ -22,6 +22,7 @@ class DatabaseSeeder extends Seeder
             estadocivilSeeder::class,
             bairroSeeder::class,
             etapaSeeder::class,
+            tagSeeder::class,
         ]);
 
     }

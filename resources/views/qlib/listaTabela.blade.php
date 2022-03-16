@@ -21,6 +21,7 @@
 <table class="table table-hover table-striped dataTable {{$routa}}" style="{{@$style}}">
     <thead>
         <tr>
+            <th class="text-center d-print-none"><input onclick="gerSelect($(this));" type="checkbox" name="todos" id=""></th>
             <th class="text-center d-print-none">...</th>
         @if (isset($campos_tabela) && is_array($campos_tabela))
                 @foreach ($campos_tabela as $kh=>$vh)
@@ -40,7 +41,11 @@
     <tbody>
         @if(isset($dados))
             @foreach($dados as $key => $val)
-            <tr ondblclick="window.location='{{ route($routa.'.edit',['id'=>$val->id]) }}'" class="@if (isset($_GET['idCad']) && $_GET['idCad']==$val->id) bg-info @endif" title="DÊ DOIS CLIQUES PARA ABRIR">
+            <tr ondblclick="window.location='{{ route($routa.'.edit',['id'=>$val->id]) }}'"  id="tr_{{$val->id}}" class="@if (isset($_GET['idCad']) && $_GET['idCad']==$val->id) bg-info @endif" title="DÊ DOIS CLIQUES PARA ABRIR">
+                    <td>
+                        <input type="checkbox" class="checkbox" onclick="color_select1_0(this.checked,this.value);" value="{{$val->id}}" name="check_{{$val->id}}" id="check_{{$val->id}}">
+                    </td>
+
                     <td class="text-right d-flex d-print-none">
                         <a href=" {{ route($routa.'.edit',['id'=>$val->id]) }} " class="btn btn-sm btn-outline-secondary mr-2">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
@@ -59,16 +64,15 @@
                             </button>
                         </form>
                     </td>
-
                 @if (isset($campos_tabela) && is_array($campos_tabela))
                     @foreach ($campos_tabela as $kd=>$vd)
                         @if (isset($vd['label']) && $vd['active'])
                             @if (isset($vd['type']) && ($vd['type']=='select' || $vd['type']=='selector'))
-                                <td>{{@$vd['arr_opc'][$val->$kd]}}</td>
+                                <td class="{{$kd}}">{{@$vd['arr_opc'][$val->$kd]}}</td>
                             @elseif (isset($vd['type']) && $vd['type']=='chave_checkbox' && isset($vd['arr_opc'][$val->$kd]))
-                                <td>{{$vd['arr_opc'][$val->$kd]}}</td>
+                                <td class="{{$kd}}">{{$vd['arr_opc'][$val->$kd]}}</td>
                             @else
-                                <td>{{$val->$kd}}</td>
+                                <td class="{{$kd}}">{{$val->$kd}}</td>
                             @endif
                         @endif
                     @endforeach

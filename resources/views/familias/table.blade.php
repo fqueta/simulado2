@@ -1,6 +1,7 @@
 <table class="table table-hover table-striped dataTable {{$routa}}" style="width: 200%">
     <thead>
         <tr>
+            <th class="text-center d-print-none"><input type="checkbox" name="todos" id=""></th>
             <th class="text-center d-print-none">...</th>
         @if (isset($campos_tabela) && is_array($campos_tabela))
                 @foreach ($campos_tabela as $kh=>$vh)
@@ -20,7 +21,10 @@
     <tbody>
         @if(isset($familias))
             @foreach($familias as $key => $familia)
-            <tr ondblclick="window.location='{{ route('familias.edit',['id'=>$familia->id]) }}'" class="@if (isset($_GET['idCad']) && $_GET['idCad']==$familia->id) bg-info @endif">
+            <tr ondblclick="window.location='{{ route('familias.edit',['id'=>$familia->id]) }}'" class="@if (isset($_GET['idCad']) && $_GET['idCad']==$familia->id) bg-info @endif ">
+                <td>
+                    <input type="checkbox" name="check_{{$familia->id}}" id="check_{{$familia->id}}">
+                </td>
                 @if ($config['exibe']=='html')
                     <td class="text-right d-flex d-print-none">
                         <a href=" {{ route('familias.edit',['id'=>$familia->id]) }} " class="btn btn-light mr-2">

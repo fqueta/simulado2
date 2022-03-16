@@ -132,6 +132,15 @@ class FamiliaController extends Controller
         }
 
         $familia_totais->completos = $completos;
+        foreach ($familia as $key => $value) {
+            if(Qlib::isJson($value['config'])){
+                $familia[$key]['config'] = Qlib::lib_json_array($value['config']);
+                foreach ($familia[$key]['config'] as $k => $val) {
+                    if(!is_array($val))
+                        $familia[$key]['config['.$k.']'] = $val;
+                }
+            }
+        }
         $ret['familia'] = $familia;
         $ret['familia_totais'] = $familia_totais;
         $ret['arr_titulo'] = $arr_titulo;
@@ -141,6 +150,9 @@ class FamiliaController extends Controller
         $ret['progresso'] = $progresso;
         $ret['link_completos'] = route('familias.index').'?filter[etapa]='.$idUltimaEtapa;
         $ret['link_idosos'] = route('familias.index').'?filter[idoso]=s';
+        $ret['config']['acao_massa'] = [
+            ['link'=>'#edit_etapa','event'=>'edit_etapa','icon'=>'fa fa-pencil','label'=>'Editar etapa'],
+        ];
         return $ret;
     }
     public function colorPorcento($val=0){
@@ -210,10 +222,47 @@ class FamiliaController extends Controller
                     'campo_id'=>'id',
                     'campo_bus'=>'nome',
                     'label'=>'Bairro',
-                ],'arr_opc'=>Qlib::sql_array("SELECT id,nome FROM bairros",'nome','id'),'exibe_busca'=>'d-block',
+                ],'arr_opc'=>Qlib::sql_array("SELECT id,nome FROM bairros WHERE ativo='s'",'nome','id'),'exibe_busca'=>'d-block',
                 'event'=>'',
-                'tam'=>'12',
+                'tam'=>'6',
                 'class'=>'select2'
+            ],
+            'tipo_residencia'=>[
+                'label'=>'tipo de residência*',
+                'active'=>true,
+                'type'=>'select',
+                // 'data_selector'=>[
+                //     'campos'=>$bairro->campos(),
+                //     'route_index'=>route('bairros.index'),
+                //     'id_form'=>'frm-bairros',
+                //     'action'=>route('bairros.store'),
+                //     'campo_id'=>'id',
+                //     'campo_bus'=>'nome',
+                //     'label'=>'Bairro',
+                // ],
+                'arr_opc'=>Qlib::sql_array("SELECT id,nome FROM tags WHERE ativo='s' AND pai='2'",'nome','id'),'exibe_busca'=>'d-block',
+                'event'=>'',
+                'tam'=>'6',
+                'class'=>'select2'
+            ],
+            'config[tag][]'=>[
+                'label'=>'Situação',
+                'active'=>false,
+                'type'=>'select',
+                // 'data_selector'=>[
+                //     'campos'=>$etapa->campos(),
+                //     'route_index'=>route('etapas.index'),
+                //     'id_form'=>'frm-etapas',
+                //     'action'=>route('etapas.store'),
+                //     'campo_id'=>'id',
+                //     'campo_bus'=>'nome',
+                //     'label'=>'Etapa',
+                // ],
+                'arr_opc'=>Qlib::sql_array("SELECT id,nome FROM tags WHERE ativo='s' AND pai='1'",'nome','id'),'exibe_busca'=>'d-block',
+                'event'=>'multiple',
+                'class'=>'select2',
+                'option_select'=>false,
+                'tam'=>'12',
             ],
             'etapa'=>[
                 'label'=>'Etapa de cadastro*',
@@ -227,7 +276,7 @@ class FamiliaController extends Controller
                     'campo_id'=>'id',
                     'campo_bus'=>'nome',
                     'label'=>'Etapa',
-                ],'arr_opc'=>Qlib::sql_array("SELECT id,nome FROM etapas",'nome','id'),'exibe_busca'=>'d-block',
+                ],'arr_opc'=>Qlib::sql_array("SELECT id,nome FROM etapas WHERE ativo='s'",'nome','id'),'exibe_busca'=>'d-block',
                 'event'=>'',
                 'tam'=>'6',
             ],
@@ -240,6 +289,7 @@ class FamiliaController extends Controller
             'nome_conjuge'=>['label'=>'Nome do Cônjuge','active'=>true,'type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'6'],
             'cpf_conjuge'=>['label'=>'CPF do Cônjuge','active'=>true,'type'=>'tel','exibe_busca'=>'d-block','event'=>'','tam'=>'6'],
             'telefone'=>['label'=>'Telefone','active'=>true,'type'=>'tel','tam'=>'3','exibe_busca'=>'d-block','event'=>'onblur=mask(this,clientes_mascaraTelefone); onkeypress=mask(this,clientes_mascaraTelefone);'],
+            'config[telefone2]'=>['label'=>'Telefone2','active'=>true,'type'=>'tel','tam'=>'3','exibe_busca'=>'d-block','event'=>'onblur=mask(this,clientes_mascaraTelefone); onkeypress=mask(this,clientes_mascaraTelefone);'],
             'escolaridade'=>[
                 'label'=>'Escolaridade',
                 'active'=>true,
@@ -253,7 +303,7 @@ class FamiliaController extends Controller
                     'campo_bus'=>'nome',
                     'label'=>'Escolaridade',
                 ],
-                'arr_opc'=>Qlib::sql_array("SELECT id,nome FROM escolaridades",'nome','id'),'exibe_busca'=>'d-block',
+                'arr_opc'=>Qlib::sql_array("SELECT id,nome FROM escolaridades WHERE ativo='s'",'nome','id'),'exibe_busca'=>'d-block',
                 'event'=>'',
                 'tam'=>'3',
                 'class'=>'select2',
@@ -271,7 +321,7 @@ class FamiliaController extends Controller
                     'campo_bus'=>'nome',
                     'label'=>'Estado Civil',
                 ],
-                'arr_opc'=>Qlib::sql_array("SELECT id,nome FROM estadocivils",'nome','id'),'exibe_busca'=>'d-block',
+                'arr_opc'=>Qlib::sql_array("SELECT id,nome FROM estadocivils WHERE ativo='s'",'nome','id'),'exibe_busca'=>'d-block',
                 'event'=>'',
                 'tam'=>'4',
                 'class'=>'select2',
@@ -285,6 +335,10 @@ class FamiliaController extends Controller
             'doc_imovel'=>['label'=>'Doc Imóvel','active'=>true,'type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'12'],
             'obs'=>['label'=>'Observação','active'=>true,'type'=>'textarea','exibe_busca'=>'d-block','event'=>'','rows'=>'4','cols'=>'80','tam'=>'12'],
         ];
+    }
+    public function camposJson(User $user)
+    {
+        return response()->json($this->campos());
     }
     public function create(User $user)
     {
@@ -396,7 +450,15 @@ class FamiliaController extends Controller
             }
             if(!$dados[0]['matricula'])
                 $config['display_matricula'] = 'd-none';
+            if(isset($dados[0]['config']) && is_array($dados[0]['config'])){
+                foreach ($dados[0]['config'] as $key => $value) {
+                    if(is_array($value)){
 
+                    }else{
+                        $dados[0]['config['.$key.']'] = $value;
+                    }
+                }
+            }
             $ret = [
                 'value'=>$dados[0],
                 'config'=>$config,
@@ -494,5 +556,39 @@ class FamiliaController extends Controller
             $ret = redirect()->route('familias.index',['mens'=>'Registro deletado com sucesso!','color'=>'success']);
         }
         return $ret;
+    }
+    public function ajaxPost(Request $request){
+        $post = $request->all();
+        $ret['exec'] = false;
+        $ret['mens'] = 'Opção inválida';
+        $ret['color'] = 'danger';
+        if(!isset($post['opc'])){
+            return response()->json($ret);
+        }
+        $ret['atualiza'] = false;
+        if($post['opc']=='salvar_etapa_massa'){
+            if(isset($post['ids']) && isset($post['etapa'])){
+                $dEtapa = Etapa::find($post['etapa']);
+                $ret['etapa'] = $dEtapa['nome'];
+                $arr_ids = explode('_',$post['ids']);
+                if(is_array($arr_ids)){
+                    foreach ($arr_ids as $k => $v) {
+                        if($v){
+                            $ds = [
+                                'etapa'=>$post['etapa'],
+                            ];
+                            $ret['atualiza'][$v] = Familia::where('id',$v)->update($ds);
+                        }
+                    }
+                }
+                $ret['ids']= $arr_ids;
+                if($ret['atualiza']){
+                    $ret['exec'] = true;
+                    $ret['mens'] = 'Cadastro(s) Atualizado(s) com sucesso!';
+                    $ret['color'] = 'success';
+                }
+            }
+        }
+        return response()->json($ret);
     }
 }

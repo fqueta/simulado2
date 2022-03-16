@@ -295,6 +295,7 @@ function delRegistro(id){
          }
      });
 }
+/*
 function submitRelatorio(id,ac){
   var don = $('#'+id+' input');
   console.log(don);
@@ -366,57 +367,45 @@ function submitRelatorio(id,ac){
        });
   //console.log(arr);
 }
-function alerta(msg,largura,altura, fecha, time,title,fechar){
+*/
+function alerta(msg,id,title,tam,fechar,time,fecha){
 
-	  if(typeof(fechar) != 'undefined')
-	  	 fechar = fechar;
-	  else
-	  	 fechar = "Fechar";
-	 if(typeof(title) != 'undefined')
-	  	 title = title;
-	  else
-	  	 title = "";
-	  if(typeof(fecha) != 'undefined')
-	  	 fecha = fecha;
-	  else
-	  	 fecha = false;
-	if(typeof(largura) != 'undefined')
-	  	 largura = largura;
-	 else
-	  	 largura = 350;
+	if(typeof(fechar) == 'undefined')
+        fechar = true;
+    if(typeof(title) == 'undefined')
+    title = 'Janela modal';
+    if(typeof(fecha) != 'undefined')
+        fecha = fecha;
+    else
+        fecha = '';
+	if(typeof(id) == 'undefined')
+    id = 'meuModal';
+	if(typeof(tam) == 'undefined')
+    tam = '';
+	if(typeof(time) == 'undefined')
+        time = 2000;
+    if(fechar)
+        fechar = '<div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">Fechar</button></div>';
+    var modalHtml = '<div class="modal fade" id="'+id+'" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">'+
+            '<div class="modal-dialog '+tam+'" role="document">'+
+                '<div class="modal-content">'+
+                    '<div class="modal-header">'+
+                        '<h5 class="modal-title">'+title+'</h5>'+
+                            '<button type="button" class="close" data-dismiss="modal" aria-label="Close">'+
+                                '<span aria-hidden="true">&times;</span>'+
+                            '</button>'+
+                    '</div>'+
+                    '<div class="modal-body">'+msg+
+                    '</div>'+fechar+
+                '</div>'+
+            '</div>'+
+        '</div>';
+        $('#'+id).remove();
+	  var bodys = $(document.body).append(modalHtml);
 
-	if(typeof(altura) != 'undefined')
-	  	 altura = altura;
-	 else
-	  	 altura = 200;
-
-	   if(typeof(time) != 'undefined')
-	  	 time = time;
-	  else
-	  	 time = 2000;
-
-	  var unico = uniqid();
-
-	  //selecionamos a tag body do arquivo e colocamos nela uma div com o nome de class Ãºnico
-	  var bodys = $(document.body).append('<div class="'+unico+' alerta">'+msg+'</div>');
-	  //
-	  $("."+$.trim(unico)).dialog({
-      resizable: true,
-      width: largura,
-      height: altura,
-      title: title,
-      modal: true,
-      buttons: {
-        fechar: function() {
-			$( this ).dialog( "close" );
-			 $(this).remove();
-
-
-        }
-      }
-    });
+	  $("#"+id).modal('show');
 	if(fecha == true)
-	setTimeout(function(){$("."+unico).dialog("close")}, time);
+	setTimeout(function(){$("#"+id).modal("hide")}, time);
 }
 function editarAssistencia(obj){
     var sele = obj.attr('sele');
@@ -462,7 +451,7 @@ function cancelEditAssistencia(frm,qtd){
 }
 function salvarAssitencia(frm,dados){
   //var var_cartao = atob(arr['var_cartao']);
-    $.ajaxSetup({
+        $.ajaxSetup({
            headers: {
                'X-CSRF-TOKEN': jQuery('meta[name="csrf-token"]').attr('content')
            }
@@ -895,42 +884,146 @@ function initSelector(obj){
         }
         //$('.mens').html(campo_nome);
     }
-    console.log(d);
 }
 function qFormCampos(config){
     if(typeof config == 'undefined'){
         return false;
     }
+    //console.log(config);
     const tl = '<label for="{campo}">{label}</label>';
     var tema = {
         text : '<div class="form-group col-{col}-{tam} {class_div}" div-id="{campo}" >{label}<input type="{type}" class="form-control {class}" id="inp-{campo}" name="{campo}" aria-describedby="{campo}" placeholder="{placeholder}" value="{value}" {event} /></div>',
         number : '<div class="form-group col-{col}-{tam} {class_div}" div-id="{campo}" >{label}<input type="{type}" class="form-control {class}" id="inp-{campo}" name="{campo}" aria-describedby="{campo}" placeholder="{placeholder}" value="{value}" {event} /></div>',
         hidden : '<div class="form-group col-{col}-{tam} {class_div} d-none" div-id="{campo}" >{label}<input type="{type}" class="form-control {class}" id="inp-{campo}" name="{campo}" aria-describedby="{campo}" placeholder="{placeholder}" value="{value}" {event} /></div>',
         chave_checkbox : '<div class="form-group col-{col}-{tam}"><div class="custom-control custom-switch  {class}"><input type="checkbox" class="custom-control-input" {checked} value="{value}"  name="{campo}" id="{campo}"><label class="custom-control-label" for="{campo}">{label}</label></div></div>',
+        select : {
+            tm1 : '<div class="form-group col-{col}-{tam} {class_div}" div-id="{campo}" >{label}<select name="{campo}" {event} class="form-control custom-select {class}">{op}</select></div>',
+            tm2 : '<option value="{k}" {selected}>{v}</option>'
+        }
     };
     var r = '';
     var ret = '';
     if(Object.entries(config).length>0){
         Object.entries(config).forEach(([key, v]) => {
             if(v.type!='hidder' && v.active==true){
-                var type = v.type;
-                r += tema[type].replaceAll('{type}',v.type);
-                var label = tl.replaceAll('{campo}',key);
-                label.replaceAll('{label}',);
-                var value = v.value?v.value:'';
-                var classe = v.class?v.class:'';
-                var placeholder = v.placeholder?v.placeholder:'';
-                r = r.replaceAll('{campo}',key);
-                r = r.replaceAll('{label}',v.label);
-                r = r.replaceAll('{value}',value);
-                r = r.replaceAll('{tam}',v.tam);
-                r = r.replaceAll('{col}','md');
-                r = r.replaceAll('{class}',classe);
-                r = r.replaceAll('{placeholder}',v.placeholder);
+                if(v.type == 'selector' || v.type == 'select'){
+                    let op='',arr = v.arr_opc,tm1 = tema['select'].tm1,tm2 = tema['select'].tm2;
+                    //console.log(arr);return;
+                    Object.entries(arr).forEach(([i, el]) => {
+                        op += tm2.replace('{k}',i);
+                        op = op.replace('{v}',el);
+                    });
+                    var type = v.type;
+                    r += tm1.replaceAll('{type}',v.type);
+                    var label = tl.replaceAll('{campo}',key);
+                    label.replaceAll('{label}',);
+                    var value = v.value?v.value:'';
+                    var classe = v.class?v.class:'';
+                    var placeholder = v.placeholder?v.placeholder:'';
+                    r = r.replaceAll('{campo}',key);
+                    r = r.replaceAll('{label}',v.label);
+                    r = r.replaceAll('{value}',value);
+                    r = r.replaceAll('{tam}',v.tam);
+                    r = r.replaceAll('{col}','md');
+                    r = r.replaceAll('{class}',classe);
+                    r = r.replaceAll('{op}',op);
+                }else{
+                    var type = v.type;
+                    r += tema[type].replaceAll('{type}',v.type);
+                    var label = tl.replaceAll('{campo}',key);
+                    label.replaceAll('{label}',);
+                    var value = v.value?v.value:'';
+                    var classe = v.class?v.class:'';
+                    var placeholder = v.placeholder?v.placeholder:'';
+                    r = r.replaceAll('{campo}',key);
+                    r = r.replaceAll('{label}',v.label);
+                    r = r.replaceAll('{value}',value);
+                    r = r.replaceAll('{tam}',v.tam);
+                    r = r.replaceAll('{col}','md');
+                    r = r.replaceAll('{class}',classe);
+                    r = r.replaceAll('{placeholder}',v.placeholder);
+                }
             }
         });
     }
     ret = r;
 
     return ret;
+}
+function color_select1_0(val,val1){
+    if(val==true){
+		$('#tr_'+val1).addClass('bg-info');
+	}
+	if(val==false){
+		$('#tr_'+val1).removeClass('bg-info');
+	}
+}
+function gerSelect(obj){
+	if(obj.is(':checked')){
+        $('.table .checkbox').each(function(){
+            this.checked = true;
+            color_select1_0(this.checked,this.value);
+        });
+	}else{
+        $('.table .checkbox').each(function(){
+            this.checked = false;
+            color_select1_0(this.checked,this.value);
+        });
+	}
+}
+function coleta_checked(obj){
+    let id = '';
+    obj.each(function (i) {
+        id += this.value+'_';
+    });
+    return id;
+}
+function dps_salvarEpatas(res,etapa,m){
+    $.each(res,function(v,k) {
+        var sl = '#tr_'+v+' .etapa';
+        $(sl).html(etapa);
+    });
+    //if(typeof m!='undefined')
+    $(m).modal('hide');
+}
+function janelaEtapaMass(selecionandos){
+    if(typeof selecionandos =='undefined'){
+        return ;
+    }
+    if(selecionandos==''){
+        var msg = '<div class="row"><div id="exibe_etapas" class="col-md-12 text-center"><p>Por favor selecione um registro!</p></div></div>';
+        alerta(msg,'modal-etapa','Alerta','',true,3000,true)
+        return;
+    }else{
+       var msg = '<form id="frm-etapas" action="/familias/ajax"><div class="row"><div id="exibe_etapas" class="col-md-12">seleEta</div></div></form>',btnsub = '<button type="button" id="submit-frm-etapas" class="btn btn-primary">Salvar</button>',m='modal-etapa';
+
+       alerta(msg,m,'Editar Etapas');
+       $.ajax({
+            type:"GET",
+            url:"/familias/campos",
+            dataType:'json',
+            success: function(res){
+                res.etapa.type = 'select';
+                res.etapa.tam = '12';
+                res.etapa.option_select = true;
+                var conp = {etapa:res.etapa};
+                var et = qFormCampos(conp);
+                et += '<input type="hidden" name="opc" value="salvar_etapa_massa"/>';
+                et += '<input type="hidden" name="ids" value="'+selecionandos+'"/>';
+                $('#exibe_etapas').html(et);
+                $(btnsub).insertAfter('#'+m+' .modal-footer button');
+                $('#submit-frm-etapas').on('click',function(e){
+                    e.preventDefault();
+                    submitFormularioCSRF($('#frm-etapas'),function(res){
+                        if(res.mens){
+                            lib_formatMensagem('.mens',res.mens,res.color);
+                        }
+                        if(res.exec && (a = res.atualiza)){
+                            dps_salvarEpatas(a,res.etapa,'#'+m);
+                        }
+                    });
+                });
+            }
+       });
+    }
 }

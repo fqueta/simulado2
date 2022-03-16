@@ -19,9 +19,10 @@ class CreateFamiliasTable extends Migration
             $table->string('token','100')->nullable();
             $table->string('area_alvo','100')->nullable();
             $table->integer('loteamento')->nullable();
+            $table->integer('tipo_residencia')->nullable();
             $table->integer('etapa')->nullable();
             $table->integer('id_loteamento')->nullable();
-            //$table->string('matricula','100')->nullable();
+            $table->string('matricula','100')->nullable();
             $table->string('quadra','50')->nullable();
             $table->string('lote','100')->nullable();
             $table->string('nome_completo','250')->nullable();
@@ -33,6 +34,7 @@ class CreateFamiliasTable extends Migration
             $table->string('estado_civil','50')->nullable();
             $table->string('situacao_profissional','150')->nullable();
             $table->integer('qtd_membros')->nullable();
+            $table->longText('membros')->nullable();
             $table->enum('idoso',['n','s']);
             $table->enum('crianca_adolescente',['s','n']);
             $table->string('bcp_bolsa_familia','100')->nullable();

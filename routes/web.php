@@ -49,6 +49,8 @@ Route::prefix('familias')->group(function(){
     Route::delete('/{id}',[FamiliaController::class,'destroy'])->where('id', '[0-9]+')->name('familias.destroy');
     Route::get('export/all', [FamiliaController::class, 'exportAll'])->name('familias.export_all');
     Route::get('export/filter', [FamiliaController::class, 'exportFilter'])->name('familias.export_filter');
+    Route::get('campos', [FamiliaController::class, 'camposJson'])->name('familias.campos');
+    Route::post('ajax', [FamiliaController::class, 'ajaxPost'])->name('familias.ajax');
 });
 Route::prefix('bairros')->group(function(){
     Route::get('/',[BairroController::class,'index'])->name('bairros.index');
@@ -107,7 +109,11 @@ Route::prefix('uploads')->group(function(){
 Route::fallback(function () {
     return view('erro404');
 });
-Route::get('/teste',[App\Http\Controllers\TesteController::class,'index'])->name('teste');
+Route::prefix('teste')->group(function(){
+    Route::get('/',[App\Http\Controllers\TesteController::class,'index'])->name('teste');
+    Route::get('/ajax',[App\Http\Controllers\TesteController::class,'ajax'])->name('teste.ajax');
+});
+
 Route::post('/upload',[App\Http\Controllers\UploadFile::class,'upload'])->name('teste.upload');
 
 Auth::routes();

@@ -20,6 +20,7 @@
         </div>
         @if (isset($campos) && is_array($campos))
             @foreach ($campos as $k=>$v)
+
             {{App\Qlib\Qlib::qForm([
                     'type'=>@$v['type'],
                     'campo'=>$k,

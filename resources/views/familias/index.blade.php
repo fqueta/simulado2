@@ -1,6 +1,6 @@
 @extends('adminlte::page')
 
-@section('title', 'Dashboard')
+@section('title', 'Familias')
 
 @section('content_header')
     <h3>{{$titulo}}</h3>
@@ -22,7 +22,7 @@
       }
   </style>
   <div class="row">
-    @include('familias.config_exibe')
+    @include('qlib.config_exibe')
     <div class="col-md-12 mens">
     </div>
     @can('is_admin')
@@ -73,12 +73,11 @@
                     {{ $titulo_tabela }}
                 @endif
             </h4>
+
             @can('is_admin')
             <div class="card-tools d-flex d-print-none">
                     @include('familias.dropdow_actions')
-                    <a href="{{ route('familias.create') }}" class="btn btn-success">
-                        <i class="fa fa-plus" aria-hidden="true"></i> Cadastrar família
-                    </a>
+                    @include('Qlib.dropdow_acaomassa')
             </div>
             @endcan
         </div>
@@ -144,6 +143,13 @@
                 var val = $(this).val();
                 var url = lib_trataAddUrl('order',val);
                 window.location = url;
+            });
+            $('[href="#edit_etapa"]').on('click',function(){
+                var selecionados = coleta_checked($('.table .checkbox:checked'));
+                janelaEtapaMass(selecionados);
+                //var url = lib_trataAddUrl('order',val);
+
+                //window.location = url;
             });
         });
     </script>

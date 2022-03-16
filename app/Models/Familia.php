@@ -11,6 +11,7 @@ class Familia extends Model
     protected $fillable = [
         'token',
         'area_alvo',
+        'etapa',
         'loteamento',
         'id_loteamento',
         'matricula',
