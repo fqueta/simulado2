@@ -24,51 +24,24 @@
       <h3>Seja bem vindo para ter acesso entre em contato com o suporte</h3>
     @else
     <div class="row">
-        <div class="col-lg-4 col-6">
-          <!-- small box -->
-          <div class="small-box bg-info">
-            <div class="inner">
-              <h3>{{$config['c_familias']['familia_totais']->todos}}</h3>
+        @if (isset($config['c_familias']['cards_home']))
+            @foreach ($config['c_familias']['cards_home'] as $k=>$v)
+            <div class="col-lg-{{$v['lg']}} col-{{$v['xs']}}">
+                <!-- small box -->
+                <div class="small-box bg-{{$v['color']}}">
+                  <div class="inner">
+                    <h3>{{$v['valor']}}</h3>
 
-              <p>Lotes cadastrados</p>
-            </div>
-            <div class="icon">
-              <i class="fa fa-map-marked-alt"></i>
-            </div>
-            <a href="{{route('familias.index')}}" class="small-box-footer">Visualizar <i class="fas fa-arrow-circle-right"></i></a>
-          </div>
-        </div>
-        <!-- ./col -->
-        <div class="col-lg-4 col-6">
-          <!-- small box -->
-          <div class="small-box bg-success">
-            <div class="inner">
-              <h3>{{$config['c_familias']['familia_totais']->completos}}<!--<sup style="font-size: 20px">%</sup>--></h3>
-
-              <p>Cadastros completos</p>
-            </div>
-            <div class="icon">
-              <i class="fa fa-check"></i>
-            </div>
-            <a href="{{$config['c_familias']['link_completos']}}" class="small-box-footer">Visualizar <i class="fas fa-arrow-circle-right"></i></a>
-          </div>
-        </div>
-        <!-- ./col -->
-        <div class="col-lg-4 col-6">
-          <!-- small box -->
-          <div class="small-box bg-warning">
-            <div class="inner">
-              <h3>{{$config['c_familias']['familia_totais']->idoso}}</h3>
-
-              <p>Familias com idosos</p>
-            </div>
-            <div class="icon">
-              <i class="fa fa-male"></i>
-            </div>
-            <a href="{{$config['c_familias']['link_idosos']}}" class="small-box-footer">Visualizar <i class="fas fa-arrow-circle-right"></i></a>
-          </div>
-        </div>
-        <!-- ./col -->
+                    <p>{{$v['label']}}</p>
+                  </div>
+                  <div class="icon">
+                    <i class="{{$v['icon']}}"></i>
+                  </div>
+                  <a href="{{$v['href']}}" class="small-box-footer">Visualizar <i class="fas fa-arrow-circle-right"></i></a>
+                </div>
+              </div>
+            @endforeach
+        @endif
     </div>
 
     <div class="row mb-5">

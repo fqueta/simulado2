@@ -69,8 +69,27 @@
                         @if (isset($vd['label']) && $vd['active'])
                             @if (isset($vd['type']) && ($vd['type']=='select' || $vd['type']=='selector'))
                                 <td class="{{$kd}}">{{@$vd['arr_opc'][$val->$kd]}}</td>
+                            @elseif (isset($vd['type']) && ($vd['type']=='select_multiple'))
+                                @php
+                                    $nk = str_replace('[]','',$kd);
+                                    $arr = $val->$nk;
+                                    $td = false;
+                                    if(is_array($arr)){
+                                        foreach ($arr as $k => $v) {
+                                            $td .= $vd['arr_opc'][$v].',';
+                                        }
+                                    }
+                                @endphp
+                                <td class="{{$kd}}">{{@$td}}</td>
                             @elseif (isset($vd['type']) && $vd['type']=='chave_checkbox' && isset($vd['arr_opc'][$val->$kd]))
                                 <td class="{{$kd}}">{{$vd['arr_opc'][$val->$kd]}}</td>
+                            @elseif(isset($vd['cp_busca']) && !empty($vd['cp_busca']))
+                                @php
+                                    $cp = explode('][',$vd['cp_busca']);
+                                @endphp
+                                @if (isset($cp[1]))
+                                    <td class="{{$cp[1]}}">{{ @$val[$cp[0]][$cp[1]] }}</td>
+                                @endif
                             @else
                                 <td class="{{$kd}}">{{$val->$kd}}</td>
                             @endif

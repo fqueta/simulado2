@@ -18,6 +18,7 @@ class StoreFamilyRequest extends FormRequest
         return [
             'loteamento'=>['required',new familyRules],
             'etapa'=>['required',new familyRules],
+            'tipo_residencia'=>['required',new familyRules],
             'area_alvo'=>['required'],
             //'matricula'=>['required'],
             'quadra'=>['required'],

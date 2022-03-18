@@ -11,12 +11,7 @@
 <script src=" {{url('/')}}/js/lib.js"></script>
 <script>
     $(function(){
-        $(".moeda").maskMoney({
-            prefix: 'R$ ',
-            allowNegative: true,
-            thousands: '.',
-            decimal: ','
-        });
+        carregaMascaraMoeda(".moeda");
         $('[selector-event]').on('change',function(){
             initSelector($(this));
         });

@@ -22,10 +22,11 @@
                                     }
                                     if($kbu!='obs')
                                         $vbu['tam'] = 3;
+                                    $cp_busca = isset($vbu['cp_busca'])?$vbu['cp_busca']:$kbu;
                                 @endphp
                                 {{App\Qlib\Qlib::qForm([
                                     'type'=>isset($vbu['type'])?$vbu['type']:'text',
-                                    'campo'=>'filter['.$kbu.']',
+                                    'campo'=>'filter['.$cp_busca.']',
                                     'placeholder'=>isset($vbu['placeholder'])?$vbu['placeholder']:'',
                                     'label'=>$vbu['label'],
                                     'ac'=>'alt',
@@ -34,6 +35,7 @@
                                     'class_div'=>$vbu['exibe_busca'],
                                     'event'=>isset($vbu['event'])?$vbu['event']:'',
                                     'arr_opc'=>isset($vbu['arr_opc'])?$vbu['arr_opc']:'',
+                                    'label_option_select'=>'Todas',
                                 ])}}
                             @endif
 

@@ -43,7 +43,13 @@ class FamiliaController extends Controller
         $ano = date('Y');
         $mes = date('m');
         $idUltimaEtapa = Etapa::where('ativo','=','s')->where('excluido','=','n')->where('deletado','=','n')->max('id');
+        $id_pendencia = 3;
+        $id_imComRegistro = 4;
+        $id_recusas = 5;
+        $id_nLocalizado = 6;
+
         $completos = 0;
+        $pendentes = 0;
         $etapas = Etapa::where('ativo','=','s')->where('excluido','=','n')->OrderBy('id','asc')->get();
         //$todasFamilias = Familia::where('excluido','=','n')->where('deletado','=','n');
         $config = [
@@ -51,15 +57,17 @@ class FamiliaController extends Controller
             'order'=>isset($get['order']) ? $get['order']: 'desc',
         ];
 
+        DB::enableQueryLog();
         $familia =  Familia::where('excluido','=','n')->where('deletado','=','n')->orderBy('id',$config['order']);
         $countFam =  Familia::where('excluido','=','n')->where('deletado','=','n')->orderBy('id',$config['order']);
-
+        $countFamPend =  Familia::where('excluido','=','n')->where('deletado','=','n')->orderBy('id',$config['order']);
         //$familia =  DB::table('familias')->where('excluido','=','n')->where('deletado','=','n')->orderBy('id',$config['order']);
 
         $familia_totais = new stdClass;
         $campos = isset($_SESSION['campos_familias_exibe']) ? $_SESSION['campos_familias_exibe'] : $this->campos();
         $tituloTabela = 'Lista de todos cadastros';
         $arr_titulo = false;
+
         if(isset($get['filter'])){
                 $titulo_tab = false;
                 $i = 0;
@@ -69,9 +77,19 @@ class FamiliaController extends Controller
                             $familia->where($key,'LIKE', $value);
                             $titulo_tab .= 'Todos com *'. $campos[$key]['label'] .'% = '.$value.'& ';
                             $arr_titulo[$campos[$key]['label']] = $value;
+                        }elseif(is_array($value)){
+                            foreach ($value as $kb => $vb) {
+                                if(!empty($vb)){
+                                    if($key=='tags'){
+                                        $familia->where($key,'LIKE', '%"'.$vb.'"%' );
+                                    }else{
+                                        $familia->where($key,'LIKE', '%"'.$kb.'":"'.$vb.'"%' );
+                                    }
+                                }
+                            }
                         }else{
                             $familia->where($key,'LIKE','%'. $value. '%');
-                            if($campos[$key]['type']=='select'){
+                            if(isset($campos[$key]['type']) && $campos[$key]['type']=='select'){
                                 $value = $campos[$key]['arr_opc'][$value];
                             }
                             $arr_titulo[$campos[$key]['label']] = $value;
@@ -90,19 +108,24 @@ class FamiliaController extends Controller
                 }else{
                     $familia = $familia->paginate($config['limit']);
                 }
+                //$query = DB::getQueryLog();
+                //$query = end($query);
+                //dd($query);
+
                 if($idUltimaEtapa)
-                    $completos = $familia->where('etapa','=',$idUltimaEtapa)->count();
+                $completos = $familia->where('etapa','=',$idUltimaEtapa)->count();
+                $pendentes = $familia->where('tags','LIKE','%"'.$id_pendencia.'"')->count();
                 $familia_totais->todos = $fm->count();
                 $familia_totais->esteMes = $fm->whereYear('created_at', '=', $ano)->whereMonth('created_at','=',$mes)->count();
                 $familia_totais->idoso = $fm->where('idoso','=','s')->count();
                 $familia_totais->criancas = $fm->where('crianca_adolescente','=','s')->count();
-
         }else{
             $fm = $familia;
             if($idUltimaEtapa){
                 $completos = $countFam->where('etapa','=',$idUltimaEtapa)->count();
-                //$completos = Familia::where('excluido','=','n')->where('deletado','=','n')->orderBy('id',$config['order'])->where('etapa','=',$idUltimaEtapa)->count();
             }
+            $pendentes = $countFamPend->where('tags','LIKE','%"'.$id_pendencia.'"%')->count();
+
             if($config['limit']=='todos'){
                 $familia = $familia->get();
             }else{
@@ -112,8 +135,6 @@ class FamiliaController extends Controller
             $familia_totais->esteMes = $fm->whereYear('created_at', '=', $ano)->whereMonth('created_at','=',$mes)->count();
             $familia_totais->idoso = $fm->where('idoso','=','s')->count();
             $familia_totais->criancas = $fm->where('crianca_adolescente','=','s')->count();
-
-
         }
         $progresso = [];
         if($etapas){
@@ -130,17 +151,19 @@ class FamiliaController extends Controller
                 $progresso[$key]['color'] = $this->colorPorcento($porceto);
             }
         }
-
         $familia_totais->completos = $completos;
+        //dd($familia[0]['config']);
+        /*
         foreach ($familia as $key => $value) {
-            if(Qlib::isJson($value['config'])){
-                $familia[$key]['config'] = Qlib::lib_json_array($value['config']);
+            if(is_array($value['config'])){
+                //$familia[$key]['config'] = Qlib::lib_json_array($value['config']);
                 foreach ($familia[$key]['config'] as $k => $val) {
                     if(!is_array($val))
                         $familia[$key]['config['.$k.']'] = $val;
                 }
             }
-        }
+        }*/
+        //dd($familia[0]['config']);
         $ret['familia'] = $familia;
         $ret['familia_totais'] = $familia_totais;
         $ret['arr_titulo'] = $arr_titulo;
@@ -150,6 +173,35 @@ class FamiliaController extends Controller
         $ret['progresso'] = $progresso;
         $ret['link_completos'] = route('familias.index').'?filter[etapa]='.$idUltimaEtapa;
         $ret['link_idosos'] = route('familias.index').'?filter[idoso]=s';
+        $ret['cards_home'] = [
+            [
+                'label'=>'Lotes cadastrados',
+                'valor'=>$familia_totais->todos,
+                'href'=>route('familias.index'),
+                'icon'=>'fa fa-map-marked-alt',
+                'lg'=>'2',
+                'xs'=>'6',
+                'color'=>'info',
+            ],
+            [
+                'label'=>'Cadastros completos',
+                'valor'=>$familia_totais->completos,
+                'href'=>$ret['link_completos'],
+                'icon'=>'fa fa-check',
+                'lg'=>'2',
+                'xs'=>'6',
+                'color'=>'success',
+            ],
+            [
+                'label'=>'Com pendências',
+                'valor'=>$pendentes,
+                'href'=>route('familias.index').'?filter[tags][]='.$id_pendencia,
+                'icon'=>'fa fa-times',
+                'lg'=>'2',
+                'xs'=>'6',
+                'color'=>'danger',
+            ],
+        ];
         $ret['config']['acao_massa'] = [
             ['link'=>'#edit_etapa','event'=>'edit_etapa','icon'=>'fa fa-pencil','label'=>'Editar etapa'],
         ];
@@ -223,7 +275,7 @@ class FamiliaController extends Controller
                     'campo_bus'=>'nome',
                     'label'=>'Bairro',
                 ],'arr_opc'=>Qlib::sql_array("SELECT id,nome FROM bairros WHERE ativo='s'",'nome','id'),'exibe_busca'=>'d-block',
-                'event'=>'',
+                'event'=>'onchange=carregaMatricula(this.value)',
                 'tam'=>'6',
                 'class'=>'select2'
             ],
@@ -243,12 +295,15 @@ class FamiliaController extends Controller
                 'arr_opc'=>Qlib::sql_array("SELECT id,nome FROM tags WHERE ativo='s' AND pai='2'",'nome','id'),'exibe_busca'=>'d-block',
                 'event'=>'',
                 'tam'=>'6',
-                'class'=>'select2'
+                'class'=>'',
+                'option_select'=>false,
             ],
-            'config[tag][]'=>[
+            'endereco'=>['label'=>'Rua','active'=>true,'type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'10'],
+            'numero'=>['label'=>'Número','active'=>true,'type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
+            'tags[]'=>[
                 'label'=>'Situação',
-                'active'=>false,
-                'type'=>'select',
+                'active'=>true,
+                'type'=>'select_multiple',
                 // 'data_selector'=>[
                 //     'campos'=>$etapa->campos(),
                 //     'route_index'=>route('etapas.index'),
@@ -259,10 +314,11 @@ class FamiliaController extends Controller
                 //     'label'=>'Etapa',
                 // ],
                 'arr_opc'=>Qlib::sql_array("SELECT id,nome FROM tags WHERE ativo='s' AND pai='1'",'nome','id'),'exibe_busca'=>'d-block',
-                'event'=>'multiple',
-                'class'=>'select2',
+                'event'=>'',
+                'class'=>'',
                 'option_select'=>false,
                 'tam'=>'12',
+                'cp_busca'=>'tags]['
             ],
             'etapa'=>[
                 'label'=>'Etapa de cadastro*',
@@ -281,7 +337,9 @@ class FamiliaController extends Controller
                 'tam'=>'6',
             ],
             'area_alvo'=>['label'=>'Área Alvo*','active'=>true,'type'=>'tel','exibe_busca'=>'d-block','event'=>'','tam'=>'2','placeholder'=>'opcional'],
-            //'matricula'=>['label'=>'Matricula','active'=>true,'type'=>'text','exibe_busca'=>'d-block','event'=>''],
+            'matricula'=>['label'=>'Matricula','active'=>true,'type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'4','placeholder'=>''],
+            'config[registro]'=>['label'=>'Registro','active'=>true,'type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'4','placeholder'=>'','cp_busca'=>'config][registro'],
+            'config[livro]'=>['label'=>'Livro','active'=>true,'type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'4','placeholder'=>'','cp_busca'=>'config][livro'],
             'quadra'=>['label'=>'Quadra*','active'=>true,'type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
             'lote'=>['label'=>'Lote*','active'=>true,'type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
             'nome_completo'=>['label'=>'Proprietário','active'=>true,'type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'6'],
@@ -289,7 +347,7 @@ class FamiliaController extends Controller
             'nome_conjuge'=>['label'=>'Nome do Cônjuge','active'=>true,'type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'6'],
             'cpf_conjuge'=>['label'=>'CPF do Cônjuge','active'=>true,'type'=>'tel','exibe_busca'=>'d-block','event'=>'','tam'=>'6'],
             'telefone'=>['label'=>'Telefone','active'=>true,'type'=>'tel','tam'=>'3','exibe_busca'=>'d-block','event'=>'onblur=mask(this,clientes_mascaraTelefone); onkeypress=mask(this,clientes_mascaraTelefone);'],
-            'config[telefone2]'=>['label'=>'Telefone2','active'=>true,'type'=>'tel','tam'=>'3','exibe_busca'=>'d-block','event'=>'onblur=mask(this,clientes_mascaraTelefone); onkeypress=mask(this,clientes_mascaraTelefone);'],
+            'config[telefone2]'=>['label'=>'Telefone2','active'=>true,'type'=>'tel','tam'=>'3','exibe_busca'=>'d-block','event'=>'onblur=mask(this,clientes_mascaraTelefone); onkeypress=mask(this,clientes_mascaraTelefone);','cp_busca'=>'config][telefone2'],
             'escolaridade'=>[
                 'label'=>'Escolaridade',
                 'active'=>true,
@@ -323,15 +381,16 @@ class FamiliaController extends Controller
                 ],
                 'arr_opc'=>Qlib::sql_array("SELECT id,nome FROM estadocivils WHERE ativo='s'",'nome','id'),'exibe_busca'=>'d-block',
                 'event'=>'',
-                'tam'=>'4',
+                'tam'=>'3',
                 'class'=>'select2',
             ],
-            'qtd_membros'=>['label'=>'Membros','active'=>true,'type'=>'number','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
-            'idoso'=>['label'=>'Idoso','active'=>true,'type'=>'chave_checkbox','value'=>'s','exibe_busca'=>'d-none','event'=>'','tam'=>'6','arr_opc'=>['s'=>'Sim','n'=>'Não']],
-            'crianca_adolescente'=>['label'=>'Criança e Adolescente','active'=>true,'exibe_busca'=>'d-none','event'=>'','type'=>'chave_checkbox','value'=>'s','exibe_busca'=>'d-block','event'=>'','tam'=>'6','arr_opc'=>['s'=>'Sim','n'=>'Não']],
             'situacao_profissional'=>['label'=>'Situação Profissional','type'=>'text','active'=>true,'exibe_busca'=>'d-block','event'=>'','tam'=>'4'],
             'bcp_bolsa_familia'=>['label'=>'BPC ou Bolsa Família','active'=>true,'type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'4'],
-            'renda_familiar'=>['label'=>'Renda Familias','active'=>true,'type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'4','class'=>'moeda'],
+            'renda_familiar'=>['label'=>'Renda Familias','active'=>true,'type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'2','class'=>'moeda'],
+            'qtd_membros'=>['label'=>'Membros','active'=>true,'type'=>'number','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
+            'membros'=>['label'=>'lista de Membros','active'=>false,'type'=>'html','exibe_busca'=>'d-none','event'=>'','tam'=>'12','script'=>'familias.lista_membros'],
+            'idoso'=>['label'=>'Idoso','active'=>true,'type'=>'chave_checkbox','value'=>'s','exibe_busca'=>'d-none','event'=>'','tam'=>'6','arr_opc'=>['s'=>'Sim','n'=>'Não']],
+            'crianca_adolescente'=>['label'=>'Criança e Adolescente','active'=>true,'exibe_busca'=>'d-none','event'=>'','type'=>'chave_checkbox','value'=>'s','exibe_busca'=>'d-block','event'=>'','tam'=>'6','arr_opc'=>['s'=>'Sim','n'=>'Não']],
             'doc_imovel'=>['label'=>'Doc Imóvel','active'=>true,'type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'12'],
             'obs'=>['label'=>'Observação','active'=>true,'type'=>'textarea','exibe_busca'=>'d-block','event'=>'','rows'=>'4','cols'=>'80','tam'=>'12'],
         ];
@@ -378,14 +437,18 @@ class FamiliaController extends Controller
         //$validated = $request->validated();
         $dados = $request->all();
         $ajax = isset($dados['ajax'])?$dados['ajax']:'n';
+        /*
         if (isset($dados['image']) && $dados['image']->isValid()){
             $nameFile = Str::of($dados['name'])->slug('-').'.'.$dados['image']->getClientOriginalExtension();
             $image = $dados['image']->storeAs('users',$nameFile);
             $dados['image'] = $image;
-        }
+        }*/
         $userLogadon = Auth::id();
-        if(isset($dados['config'])){
-            $dados['config'] = Qlib::lib_array_json($dados['config']);
+        $arr_camposArr = ['membros'];
+        foreach ($arr_camposArr as $key => $value) {
+            if(isset($dados[$value])){
+                $dados[$value] = Qlib::lib_array_json($dados[$value]);
+            }
         }
         $dados['idoso'] = isset($dados['idoso'])?$dados['idoso']:'n';
         $dados['crianca_adolescente'] = isset($dados['crianca_adolescente'])?$dados['crianca_adolescente']:'n';
@@ -459,6 +522,7 @@ class FamiliaController extends Controller
                     }
                 }
             }
+            //$dados[0]['tags'] = Qlib::lib_json_array($dados[0]['tags']);
             $ret = [
                 'value'=>$dados[0],
                 'config'=>$config,
@@ -470,7 +534,6 @@ class FamiliaController extends Controller
                 'campos'=>$campos,
                 'exec'=>true,
             ];
-
             return view($this->routa.'.createedit',$ret);
         }else{
             $ret = [
@@ -504,11 +567,9 @@ class FamiliaController extends Controller
         $data['idoso'] = isset($data['idoso'])?$data['idoso']:'n';
         $data['crianca_adolescente'] = isset($data['crianca_adolescente'])?:'n';
         $data['config']['atualizado_por'] = $userLogadon;
-        if(isset($dados['config'])){
-            $dados['config'] = Qlib::lib_array_json($dados['config']);
-        }
-        $atualizar=false;
+        $data['tags'] = isset($data['tags'])?$data['tags']:false;
         if(!empty($data)){
+            //dd($data);
             $atualizar=Familia::where('id',$id)->update($data);
             $route = 'familias.index';
             $ret = [

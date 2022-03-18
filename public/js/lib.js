@@ -782,6 +782,46 @@ function submitFormulario(objForm,funCall,funError){
         }
     });
 }
+function getAjax(config,funCall,funError){
+
+    if(typeof config.url == 'undefined'){
+        alert('informe a Url');
+        return false;
+    }
+    if(typeof config.type == 'undefined'){
+        config.type = 'GET';
+    }
+    if(typeof config.data == 'undefined'){
+        config.data = {ajax:'s'};
+    }
+    if(typeof funCall == 'undefined'){
+        funCall = function(res){
+            console.log(res);
+        }
+    }
+    if(typeof funError == 'undefined'){
+        funError = function(res){
+            lib_funError(res);
+        }
+    }
+    $.ajax({
+        type: config.type,
+        url: config.url,
+        data: config.data,
+        dataType: 'json',
+        success: function (data) {
+            funCall(data);
+        },
+        error: function (data) {
+            if(data.errors){
+                funError(data.errors);
+                console.log(data.errors);
+            }else{
+                lib_formatMensagem('.mens','Erro','danger');
+            }
+        }
+    });
+}
 function submitFormularioCSRF(objForm,funCall,funError){
     if(typeof funCall == 'undefined'){
         funCall = function(res){
@@ -1026,4 +1066,12 @@ function janelaEtapaMass(selecionandos){
             }
        });
     }
+}
+function carregaMascaraMoeda(s){
+    $(s).maskMoney({
+        prefix: 'R$ ',
+        allowNegative: true,
+        thousands: '.',
+        decimal: ','
+    });
 }

@@ -8,9 +8,14 @@ use Illuminate\Database\Eloquent\Model;
 class Familia extends Model
 {
     use HasFactory;
+    protected $casts = [
+        'config' => 'array',
+        'tags' => 'array',
+    ];
     protected $fillable = [
         'token',
         'area_alvo',
+        'tipo_residencia',
         'etapa',
         'loteamento',
         'id_loteamento',
@@ -26,6 +31,7 @@ class Familia extends Model
         'estado_civil',
         'situacao_profissional',
         'qtd_membros',
+        'membros',
         'idoso',
         'crianca_adolescente',
         'bcp_bolsa_familia',
@@ -36,8 +42,8 @@ class Familia extends Model
         'bairro',
         'cidade',
         'autor',
-        'config',
         'obs',
+        'tags',
         'excluido',
         'reg_excluido',
         'deletado',

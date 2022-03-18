@@ -45,8 +45,9 @@ class CreateFamiliasTable extends Migration
             $table->string('bairro','200')->nullable();
             $table->string('cidade','100')->nullable();
             $table->integer('autor')->nullable();
-            $table->longText('config')->nullable();
             $table->longText('obs')->nullable();
+            $table->json('tags')->nullable();
+            $table->json('config')->nullable();
             $table->enum('excluido',['n','s']);
             $table->text('reg_excluido')->nullable();
             $table->enum('deletado',['n','s']);

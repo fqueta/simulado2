@@ -31,6 +31,7 @@
                     'config'=>$config,
                     'value'=>$value,
                 ])}}
+
             </div>
         </div>
     </div>
@@ -88,5 +89,17 @@
                 });
           });
     });
+    function carregaMatricula(val){
+        if(val==''|| val=='cad'|| val=='ger')
+            return ;
+        getAjax({
+            url:'/bairros/'+val+'/edit?ajax=s',
+        },function(res){
+            if(m=res.value.matricula){
+                $('[name="matricula"]').val(m);
+            }
+        });
+    }
+
     </script>
 @stop

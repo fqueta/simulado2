@@ -18,6 +18,28 @@
             @enderror
         </div>
         @endif
+    @elseif ($config['type']=='select_multiple')
+        @if (isset($config['arr_opc']))
+        <div class="form-group col-{{$config['col']}}-{{$config['tam']}} {{$config['class_div']}}" div-id="{{$config['campo']}}">
+            @php
+                //$config['value'] = json_decode($config['value'],true);
+            @endphp
+            @if ($config['label'])
+                <label for="{{$config['campo']}}">{{$config['label']}}</label>
+            @endif
+            <select name="{{$config['campo']}}" multiple="true" {{$config['event']}} id="sele-{{$config['campo']}} @error($config['campo']) is-invalid @enderror" class="form-control custom-select select2 {{$config['class']}}">
+                @if ($config['option_select'])
+                    <option value=""> {{$config['label_option_select']}} </option>
+                @endif
+                @foreach ($config['arr_opc'] as $k=>$v)
+                    <option value="{{$k}}" @if(isset($config['value']) && is_array($config['value']) && in_array($k,$config['value'])) selected @endif>{{$v}}</option>
+                @endforeach
+            </select>
+            @error($config['campo'])
+            <div class="alert alert-danger">{{ $message }}</div>
+            @enderror
+        </div>
+        @endif
     @elseif ($config['type']=='selector')
         @if (isset($config['arr_opc']))
             <div class="form-group col-{{$config['col']}}-{{$config['tam']}} {{$config['class_div']}}" div-id="{{$config['campo']}}">
@@ -82,6 +104,15 @@
             <label for="{{$config['campo']}}">{{$config['label']}}</label><br>
             <textarea name="{{$config['campo']}}" class="form-control @error($config['campo']) is-invalid @enderror {{$config['class']}}" rows="{{@$config['rows']}}" cols="{{@$config['cols']}}">@if(isset($config['value'])){{$config['value']}}@elseif($config['ac']=='cad'){{old($config['campo'])}}@endif</textarea>
             </div>
+        </div>
+    @elseif ($config['type']=='html')
+        @php
+           $config['script'] = isset($config['script'])?$config['script']:false;
+        @endphp
+        <div class="col-{{$config['col']}}-{{$config['tam']}} {{$config['class_div']}}" div-id="{{$config['campo']}}">
+            @if ($config['script'])
+                @include($config['script'])
+            @endif
         </div>
     @else
     <div class="form-group col-{{$config['col']}}-{{$config['tam']}} {{$config['class_div']}}" div-id="{{$config['campo']}}" >

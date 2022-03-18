@@ -20,6 +20,12 @@
         </div>
         @if (isset($campos) && is_array($campos))
             @foreach ($campos as $k=>$v)
+                @if ($v['type']=='select_multiple')
+                    @php
+                        $nk = str_replace('[]','',$k);
+                        $value[$k] = isset($value[$nk])?$value[$nk]:false;
+                    @endphp
+                @endif
 
             {{App\Qlib\Qlib::qForm([
                     'type'=>@$v['type'],
@@ -39,6 +45,7 @@
                     'rows'=>@$v['rows'],
                     'cols'=>@$v['cols'],
                     'data_selector'=>@$v['data_selector'],
+                    'script'=>@$v['script'],
             ])}}
             @endforeach
         @endif

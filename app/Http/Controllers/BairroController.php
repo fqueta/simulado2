@@ -121,10 +121,11 @@ class BairroController extends Controller
         $this->authorize('is_admin', $user);
         $title = 'Cidades Cadastradas';
         $titulo = $title;
+        $ajax = isset($_GET['ajax'])?$_GET['ajax']:false;
         $queryBairros = $this->queryBairros($_GET);
         $queryBairros['config']['exibe'] = 'html';
         $routa = $this->routa;
-        return view($routa.'.index',[
+        $ret = [
             'dados'=>$queryBairros['bairro'],
             'title'=>$title,
             'titulo'=>$titulo,
@@ -135,7 +136,11 @@ class BairroController extends Controller
             'config'=>$queryBairros['config'],
             'routa'=>$routa,
             'i'=>0,
-        ]);
+        ];
+        if($ajax){
+            return response()->json($ret);
+        }
+        return view($routa.'.index',$ret);
     }
     public function create(User $user)
     {
@@ -196,6 +201,7 @@ class BairroController extends Controller
     {
         $dados = Bairro::where('id',$id)->get();
         $routa = 'bairros';
+        $ajax = isset($_GET['ajax'])?$_GET['ajax']:false;
         $this->authorize('is_admin', $user);
 
         if(!empty($dados)){
@@ -226,8 +232,11 @@ class BairroController extends Controller
                 'campos'=>$campos,
                 'exec'=>true,
             ];
-
-            return view($routa.'.createedit',$ret);
+            if($ajax=='s'){
+                return response()->json($ret);
+            }else{
+                return view($routa.'.createedit',$ret);
+            }
         }else{
             $ret = [
                 'exec'=>false,

@@ -137,7 +137,6 @@ class Qlib
             $config['class'] = isset($config['class']) ? $config['class'] : false;
             $config['style'] = isset($config['style']) ? $config['style'] : false;
             $config['class_div'] = isset($config['class_div']) ? $config['class_div'] : false;
-
             return view('qlib.campos_form',['config'=>$config]);
         }else{
             return false;
