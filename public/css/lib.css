@@ -1,6 +1,7 @@
 .div-salvar{
   position: fixed;
   bottom: 3px;
+  z-index: 2;
 }
 .mens{
   position: fixed;

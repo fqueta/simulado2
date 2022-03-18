@@ -233,4 +233,12 @@ class Qlib
             return false;
         }
     }
+    static function UrlAtual(){
+        $pageURL = 'http';
+        if (@$_SERVER["HTTPS"] == "on") {$pageURL .= "s";}
+        $pageURL .= "://";
+        $pageURL .= $_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"];
+
+           return $pageURL;
+    }
 }

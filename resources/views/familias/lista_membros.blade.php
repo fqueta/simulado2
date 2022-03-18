@@ -1,6 +1,8 @@
 <div class="card">
     <div class="card-header">
-        {{__('Lista de Membros')}}
+        <h6>
+            {{__('Lista de Residentes no imóvel')}}
+        </h6>
     </div>
     @php
         $tema = '<td><input type="text" name="nome" value="{nome}" class="form-control" /></td>

@@ -75,12 +75,19 @@
           $(function(){
           $('[type="submit"]').on('click',function(e){
                 e.preventDefault();
+                let btn_press = $(this).attr('btn');
                 submitFormulario($('#{{$config['frm_id']}}'),function(res){
                     if(res.exec){
                         lib_formatMensagem('.mens',res.mens,res.color);
                     }
-                    if(res.return){
-                        window.location = res.return
+                    if(btn_press=='sair'){
+                        if(res.return){
+                            window.location = res.return
+                        }
+                    }else if(btn_press=='permanecer'){
+                        if(res.redirect){
+                            window.location = res.redirect;
+                        }
                     }
                     if(res.errors){
                         alert('erros');

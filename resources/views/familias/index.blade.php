@@ -145,9 +145,6 @@
             $('[href="#edit_etapa"]').on('click',function(){
                 var selecionados = coleta_checked($('.table .checkbox:checked'));
                 janelaEtapaMass(selecionados);
-                //var url = lib_trataAddUrl('order',val);
-
-                //window.location = url;
             });
         });
     </script>

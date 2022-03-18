@@ -18,6 +18,7 @@
         padding: 0%;
     }
 </style>
+{{ App\Qlib\Qlib::urlAtual() }}
 <table class="table table-hover table-striped dataTable {{$routa}}" style="{{@$style}}">
     <thead>
         <tr>
