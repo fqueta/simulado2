@@ -77,7 +77,7 @@
             @can('is_admin')
             <div class="card-tools d-flex d-print-none">
                     @include('familias.dropdow_actions')
-                    @include('Qlib.dropdow_acaomassa')
+                    @include('qlib.dropdow_acaomassa')
             </div>
             @endcan
         </div>
