@@ -41,7 +41,7 @@
                     </a>
                 </div>
                 <div class="collapse" id="busca-id">
-                    @include('Qlib.busca')
+                    @include('qlib.busca')
                 </div>
             </div>
         </form>
