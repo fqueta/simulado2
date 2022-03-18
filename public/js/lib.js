@@ -992,10 +992,10 @@ function qFormCampos(config){
 }
 function color_select1_0(val,val1){
     if(val==true){
-		$('#tr_'+val1).addClass('bg-info');
+		$('#tr_'+val1).addClass('table-info');
 	}
 	if(val==false){
-		$('#tr_'+val1).removeClass('bg-info');
+		$('#tr_'+val1).removeClass('table-info');
 	}
 }
 function gerSelect(obj){

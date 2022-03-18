@@ -46,7 +46,7 @@
     <tbody>
         @if(isset($dados))
             @foreach($dados as $key => $val)
-            <tr ondblclick="window.location='{{ route($routa.'.edit',['id'=>$val->id]) }}?redirect={{urlencode($redirect.'idCad='.$val->id)}}'"  id="tr_{{$val->id}}" class="@if (isset($_GET['idCad']) && $_GET['idCad']==$val->id) bg-info @endif" title="DÊ DOIS CLIQUES PARA ABRIR">
+            <tr ondblclick="window.location='{{ route($routa.'.edit',['id'=>$val->id]) }}?redirect={{urlencode($redirect.'idCad='.$val->id)}}'"  id="tr_{{$val->id}}" class="@if (isset($_GET['idCad']) && $_GET['idCad']==$val->id) table-info @endif" title="DÊ DOIS CLIQUES PARA ABRIR">
                     <td>
                         <input type="checkbox" class="checkbox" onclick="color_select1_0(this.checked,this.value);" value="{{$val->id}}" name="check_{{$val->id}}" id="check_{{$val->id}}">
                     </td>
