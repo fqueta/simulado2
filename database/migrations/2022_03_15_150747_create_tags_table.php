@@ -22,6 +22,7 @@ class CreateTagsTable extends Migration
             $table->integer('pai')->nullable();
             $table->integer('autor')->nullable();
             $table->longText('obs')->nullable();
+            $table->json('config')->nullable();
             $table->enum('excluido',['n','s']);
             $table->text('reg_excluido')->nullable();
             $table->enum('deletado',['n','s']);

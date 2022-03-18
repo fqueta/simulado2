@@ -9,6 +9,9 @@ use Illuminate\Notifications\Notifiable;
 class Tag extends Model
 {
     use HasFactory,Notifiable;
+    protected $casts = [
+        'config' => 'array',
+    ];
     protected $fillable = [
         'token',
         'nome',

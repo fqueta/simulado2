@@ -22,6 +22,7 @@ use Illuminate\Support\Facades\URL;
 use App\Exports\UsersExport;
 use App\Models\Bairro;
 use App\Models\Etapa;
+use App\Models\Tag;
 use DataTables;
 use Illuminate\Support\Facades\Auth;
 
@@ -43,11 +44,11 @@ class FamiliaController extends Controller
         $ano = date('Y');
         $mes = date('m');
         $idUltimaEtapa = Etapa::where('ativo','=','s')->where('excluido','=','n')->where('deletado','=','n')->max('id');
+        $tags = Tag::where('ativo','=','s')->where('pai','=','1')->where('excluido','=','n')->where('deletado','=','n')->get();
         $id_pendencia = 3;
         $id_imComRegistro = 4;
         $id_recusas = 5;
         $id_nLocalizado = 6;
-
         $completos = 0;
         $pendentes = 0;
         $etapas = Etapa::where('ativo','=','s')->where('excluido','=','n')->OrderBy('id','asc')->get();
@@ -60,7 +61,7 @@ class FamiliaController extends Controller
         DB::enableQueryLog();
         $familia =  Familia::where('excluido','=','n')->where('deletado','=','n')->orderBy('id',$config['order']);
         $countFam =  Familia::where('excluido','=','n')->where('deletado','=','n')->orderBy('id',$config['order']);
-        $countFamPend =  Familia::where('excluido','=','n')->where('deletado','=','n')->orderBy('id',$config['order']);
+
         //$familia =  DB::table('familias')->where('excluido','=','n')->where('deletado','=','n')->orderBy('id',$config['order']);
 
         $familia_totais = new stdClass;
@@ -124,7 +125,6 @@ class FamiliaController extends Controller
             if($idUltimaEtapa){
                 $completos = $countFam->where('etapa','=',$idUltimaEtapa)->count();
             }
-            $pendentes = $countFamPend->where('tags','LIKE','%"'.$id_pendencia.'"%')->count();
 
             if($config['limit']=='todos'){
                 $familia = $familia->get();
@@ -173,6 +173,7 @@ class FamiliaController extends Controller
         $ret['progresso'] = $progresso;
         $ret['link_completos'] = route('familias.index').'?filter[etapa]='.$idUltimaEtapa;
         $ret['link_idosos'] = route('familias.index').'?filter[idoso]=s';
+        $cardTags = [];
         $ret['cards_home'] = [
             [
                 'label'=>'Lotes cadastrados',
@@ -192,16 +193,24 @@ class FamiliaController extends Controller
                 'xs'=>'6',
                 'color'=>'success',
             ],
-            [
-                'label'=>'Com pendências',
-                'valor'=>$pendentes,
-                'href'=>route('familias.index').'?filter[tags][]='.$id_pendencia,
-                'icon'=>'fa fa-times',
-                'lg'=>'2',
-                'xs'=>'6',
-                'color'=>'danger',
-            ],
         ];
+        if(!empty($tags)){
+            foreach ($tags as $kt => $vt) {
+                $countFamTag =  Familia::where('excluido','=','n')->where('deletado','=','n')->orderBy('id',$config['order'])->where('tags','LIKE','%"'.$vt['id'].'"%')->count();
+                $cardTags[$vt['id']] =
+                [
+                    'label'=>$vt['nome'],
+                    'valor'=>$countFamTag,
+                    'href'=>route('familias.index').'?filter[tags][]='.$vt['id'],
+                    'icon'=>$vt['config']['icon'],
+                    'lg'=>'2',
+                    'xs'=>'6',
+                    'color'=>$vt['config']['color'],
+                ];
+                array_push($ret['cards_home'],$cardTags[$vt['id']]);
+            }
+        }
+
         $ret['config']['acao_massa'] = [
             ['link'=>'#edit_etapa','event'=>'edit_etapa','icon'=>'fa fa-pencil','label'=>'Editar etapa'],
         ];
@@ -386,7 +395,7 @@ class FamiliaController extends Controller
             ],
             'situacao_profissional'=>['label'=>'Situação Profissional','type'=>'text','active'=>true,'exibe_busca'=>'d-block','event'=>'','tam'=>'4'],
             'bcp_bolsa_familia'=>['label'=>'BPC ou Bolsa Família','active'=>true,'type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'4'],
-            'renda_familiar'=>['label'=>'Renda Familias','active'=>true,'type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'2','class'=>'moeda'],
+            'renda_familiar'=>['label'=>'Renda Fam.','active'=>true,'type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'2','class'=>'moeda'],
             'qtd_membros'=>['label'=>'Membros','active'=>true,'type'=>'number','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
             'membros'=>['label'=>'lista de Membros','active'=>false,'type'=>'html','exibe_busca'=>'d-none','event'=>'','tam'=>'12','script'=>'familias.lista_membros'],
             'idoso'=>['label'=>'Idoso','active'=>true,'type'=>'chave_checkbox','value'=>'s','exibe_busca'=>'d-none','event'=>'','tam'=>'6','arr_opc'=>['s'=>'Sim','n'=>'Não']],

@@ -26,6 +26,7 @@ class FamiliaFactory extends Factory
             'nome_completo'=>$this->faker->name($gender),
             //'cpf'=>'',
             'nome_conjuge'=>$this->faker->name($gender),
+            'endereco'=>$this->faker->address,
             //'cpf_conjuge'=>'',
             'telefone'=>'',
             'escolaridade'=>rand(1,10),
@@ -37,6 +38,7 @@ class FamiliaFactory extends Factory
             'bcp_bolsa_familia'=>'',
             'renda_familiar'=>(double)$this->getData('renda_familiar'),
             'doc_imovel'=>$this->getData('doc_imovel'),
+            'tags'=>[$this->getData('tags')],
             'endereco'=>'',
             'numero'=>'',
             'bairro'=>'',
@@ -61,6 +63,8 @@ class FamiliaFactory extends Factory
                 $arr = ['70.1','70.4','80.6'];
             }elseif($campo=='loteamento'){
                 $arr = ['1','2','3','4'];
+            }elseif($campo=='tags'){
+                $arr = ['3','4','5','6'];
             }elseif($campo=='etapa'){
                 $arr = ['1','2','3','4','5','6','7','8'];
             }elseif($campo=='idoso'||$campo=='crianca_adolescente'){

@@ -23,7 +23,7 @@
     @can('user')
       <h3>Seja bem vindo para ter acesso entre em contato com o suporte</h3>
     @else
-    <div class="row">
+    <div class="row card-top">
         @if (isset($config['c_familias']['cards_home']))
             @foreach ($config['c_familias']['cards_home'] as $k=>$v)
             <div class="col-lg-{{$v['lg']}} col-{{$v['xs']}}">
@@ -84,7 +84,7 @@
 @stop
 
 @section('css')
-    <link rel="stylesheet" href="/css/admin_custom.css">
+    <link rel="stylesheet" href="{{url('/')}}/css/lib.css">
 @stop
 
 @section('js')

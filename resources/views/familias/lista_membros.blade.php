@@ -23,11 +23,11 @@
             <table id="list-membros" class="table table-hover">
                 <thead>
                     <tr>
-                        <th style="width: 35%">Nome</th>
-                        <th>Grau de Parentesco</th>
-                        <th>Idade</th>
-                        <th>Renda</th>
-                        <th>...</th>
+                        <th class="text-center" style="width: 35%">Nome</th>
+                        <th class="text-center">Parentesco</th>
+                        <th class="text-center">Idade</th>
+                        <th class="text-center">Renda</th>
+                        <th class="text-center">...</th>
                     </tr>
                 </thead>
                 <tbody>

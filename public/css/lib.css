@@ -19,3 +19,9 @@ table.familias td{
     text-overflow: ellipsis;
     white-space: nowrap;
 }
+.card-top .small-box p {
+    max-width: 28ch;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
