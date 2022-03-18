@@ -9,7 +9,7 @@
   <!--<p>Selecione os publicadores do seu familia para enviar o relatorio para o secretário</p>-->
 
   <div class="row">
-    @include('Qlib.config_exibe')
+    @include('qlib.config_exibe')
     <div class="col-md-12 mens">
     </div>
     @can('is_admin')
@@ -37,7 +37,7 @@
             @can('is_admin')
             <div class="card-tools d-flex d-print-none">
                     @include($routa.'.dropdow_actions')
-                    @include('Qlib.dropdow_acaomassa')
+                    @include('qlib.dropdow_acaomassa')
             </div>
             @endcan
         </div>
