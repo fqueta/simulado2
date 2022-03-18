@@ -30,7 +30,7 @@
                             <th scope="col" class="text-center">Parentesco</th>
                             <th scope="col" class="text-center">Idade</th>
                             <th scope="col" class="text-center">Renda</th>
-                            <th scope="col" class="text-center">...</th>
+                            <th scope="col" class="text-center">Ação</th>
                         </tr>
                     </thead>
                     <tbody>
