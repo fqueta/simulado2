@@ -26,7 +26,7 @@ class FamiliaFactory extends Factory
             'nome_completo'=>$this->faker->name($gender),
             //'cpf'=>'',
             'nome_conjuge'=>$this->faker->name($gender),
-            'endereco'=>$this->faker->address,
+            'endereco'=>$this->faker->address(),
             //'cpf_conjuge'=>'',
             'telefone'=>'',
             'escolaridade'=>rand(1,10),
