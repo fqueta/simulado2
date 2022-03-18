@@ -270,7 +270,7 @@ class FamiliaController extends Controller
         $escolaridade = new EscolaridadeController($user);
         $estadocivil = new EstadocivilController($user);
         return [
-            'id'=>['label'=>'Id','active'=>true,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'3','placeholder'=>'opcional'],
+            'id'=>['label'=>'Id','active'=>true,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'3','placeholder'=>''],
             'loteamento'=>[
                 'label'=>'Bairro ou distrito*',
                 'active'=>true,
@@ -345,7 +345,7 @@ class FamiliaController extends Controller
                 'event'=>'',
                 'tam'=>'6',
             ],
-            'area_alvo'=>['label'=>'Área Alvo*','active'=>true,'type'=>'tel','exibe_busca'=>'d-block','event'=>'','tam'=>'2','placeholder'=>'opcional'],
+            'area_alvo'=>['label'=>'Área Alvo*','active'=>true,'type'=>'tel','exibe_busca'=>'d-block','event'=>'','tam'=>'2','placeholder'=>''],
             'matricula'=>['label'=>'Matricula','active'=>true,'type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'4','placeholder'=>''],
             'config[registro]'=>['label'=>'Registro','active'=>true,'type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'4','placeholder'=>'','cp_busca'=>'config][registro'],
             'config[livro]'=>['label'=>'Livro','active'=>true,'type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'4','placeholder'=>'','cp_busca'=>'config][livro'],
