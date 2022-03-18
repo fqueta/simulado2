@@ -66,22 +66,7 @@
                 openPageLink(e,$(this).attr('href'),"{{date('Y')}}");
             });
           });
-          $(function(){
-          $('[type="submit"]').on('click',function(e){
-                e.preventDefault();
-                submitFormulario($('#{{$config['frm_id']}}'),function(res){
-                    if(res.exec){
-                        lib_formatMensagem('.mens',res.mens,res.color);
-                    }
-                    if(res.return){
-                        window.location = res.return
-                    }
-                    if(res.errors){
-                        alert('erros');
-                        console.log(res.errors);
-                    }
-                });
-          });
-    });
+
     </script>
+    @include('qlib.js_submit')
 @stop

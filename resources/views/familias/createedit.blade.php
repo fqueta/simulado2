@@ -72,29 +72,7 @@
             });
             $('#inp-cpf,#inp-cpf_conjuge').inputmask('999.999.999-99');
           });
-          $(function(){
-          $('[type="submit"]').on('click',function(e){
-                e.preventDefault();
-                let btn_press = $(this).attr('btn');
-                submitFormulario($('#{{$config['frm_id']}}'),function(res){
-                    if(res.exec){
-                        lib_formatMensagem('.mens',res.mens,res.color);
-                    }
-                    if(btn_press=='sair'){
-                        if(res.return){
-                            window.location = res.return
-                        }
-                    }else if(btn_press=='permanecer'){
-                        if(res.redirect){
-                            window.location = res.redirect;
-                        }
-                    }
-                    if(res.errors){
-                        alert('erros');
-                        console.log(res.errors);
-                    }
-                });
-          });
+
     });
     function carregaMatricula(val){
         if(val==''|| val=='cad'|| val=='ger')
@@ -104,9 +82,12 @@
         },function(res){
             if(m=res.value.matricula){
                 $('[name="matricula"]').val(m);
+            }else{
+                $('[name="matricula"]').val('');
             }
         });
     }
 
     </script>
+    @include('qlib.js_submit')
 @stop

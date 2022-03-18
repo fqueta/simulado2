@@ -190,7 +190,7 @@ class EscolaridadeController extends Controller
         $this->authorize('is_admin', $user);
 
         if(!empty($dados)){
-            $title = 'Editar Cadastro de escolaridades';
+            $title = 'Editar cadastro de escolaridade';
             $titulo = $title;
             $dados[0]['ac'] = 'alt';
             if(isset($dados[0]['config'])){

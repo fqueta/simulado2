@@ -30,27 +30,6 @@
             </div>
         </div>
     </div>
-    <!--
-    <div class="col-md-4">
-        <div class="card">
-            <div class="card-header">
-                <h3 class="card-title">Arquivos</h3>
-                <div class="card-tools">
-                    <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
-                      <i class="fas fa-minus"></i>
-                    </button>
-                </div>
-            </div>
-            <div class="card-body">
-                App\Qlib\Qlib::gerUploadAquivos([
-                    'pasta'=>'bairros/'.date('Y').'/'.date('m'),
-                    'token_produto'=>$value['token'],
-                    'tab'=>'bairros',
-                    'listFiles'=>@$listFiles,
-                ])}}
-            </div>
-        </div>
-    </div>-->
 </div>
 
 @stop
@@ -67,22 +46,6 @@
                 openPageLink(e,$(this).attr('href'),"{{date('Y')}}");
             });
           });
-          $(function(){
-          $('[type="submit"]').on('click',function(e){
-                e.preventDefault();
-                submitFormulario($('#{{$config['frm_id']}}'),function(res){
-                    if(res.exec){
-                        lib_formatMensagem('.mens',res.mens,res.color);
-                    }
-                    if(res.return){
-                        window.location = res.return
-                    }
-                    if(res.errors){
-                        alert('erros');
-                        console.log(res.errors);
-                    }
-                });
-          });
-    });
     </script>
+    @include('qlib.js_submit')
 @stop

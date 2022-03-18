@@ -3,6 +3,11 @@
     $routa = isset($conf['routa']) ? $conf['routa'] : false;
     $campos_tabela = isset($conf['campos_tabela']) ? $conf['campos_tabela'] : false;
     $dados = isset($conf['dados']) ? $conf['dados'] : false;
+    $sb = '?';
+    if(isset($_GET['page'])){
+        $sb = '?page='.$_GET['page'].'&';
+    }
+    $redirect = route($routa.'.index').$sb;
 @endphp
 <style media="print">
     #DataTables_Table_0_wrapper .row:first-child{
@@ -18,37 +23,36 @@
         padding: 0%;
     }
 </style>
-{{ App\Qlib\Qlib::urlAtual() }}
 <table class="table table-hover table-striped dataTable {{$routa}}" style="{{@$style}}">
     <thead>
         <tr>
             <th class="text-center d-print-none"><input onclick="gerSelect($(this));" type="checkbox" name="todos" id=""></th>
             <th class="text-center d-print-none">...</th>
-        @if (isset($campos_tabela) && is_array($campos_tabela))
+            @if (isset($campos_tabela) && is_array($campos_tabela))
                 @foreach ($campos_tabela as $kh=>$vh)
                     @if (isset($vh['label']) && $vh['active'])
                         <th style="{{ @$vd['style'] }}">{{$vh['label']}}</th>
                     @endif
                 @endforeach
 
-        @else
-            <th>#</th>
-            <th>Nome</th>
-            <th>Area</th>
-            <th>Obs</th>
-        @endif
+            @else
+                <th>#</th>
+                <th>Nome</th>
+                <th>Area</th>
+                <th>Obs</th>
+            @endif
         </tr>
     </thead>
     <tbody>
         @if(isset($dados))
             @foreach($dados as $key => $val)
-            <tr ondblclick="window.location='{{ route($routa.'.edit',['id'=>$val->id]) }}'"  id="tr_{{$val->id}}" class="@if (isset($_GET['idCad']) && $_GET['idCad']==$val->id) bg-info @endif" title="DÊ DOIS CLIQUES PARA ABRIR">
+            <tr ondblclick="window.location='{{ route($routa.'.edit',['id'=>$val->id]) }}?redirect={{urlencode($redirect.'idCad='.$val->id)}}'"  id="tr_{{$val->id}}" class="@if (isset($_GET['idCad']) && $_GET['idCad']==$val->id) bg-info @endif" title="DÊ DOIS CLIQUES PARA ABRIR">
                     <td>
                         <input type="checkbox" class="checkbox" onclick="color_select1_0(this.checked,this.value);" value="{{$val->id}}" name="check_{{$val->id}}" id="check_{{$val->id}}">
                     </td>
 
                     <td class="text-right d-flex d-print-none">
-                        <a href=" {{ route($routa.'.edit',['id'=>$val->id]) }} " class="btn btn-sm btn-outline-secondary mr-2">
+                        <a href=" {{ route($routa.'.edit',['id'=>$val->id]) }}?redirect={{urlencode($redirect.'idCad='.$val->id)}} " class="btn btn-sm btn-outline-secondary mr-2">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
                             <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
                             <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
