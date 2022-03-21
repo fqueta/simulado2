@@ -49,4 +49,8 @@ class Familia extends Model
         'deletado',
         'reg_deletado',
     ];
+    public function etapa()
+    {
+        return $this->hasOne('App\Models\Etapa');
+    }
 }

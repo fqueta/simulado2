@@ -15,18 +15,19 @@ class etapaSeeder extends Seeder
     public function run()
     {
         $arr = [
-            ['nome'=>'1. Selagem dos imóveis (topografia + equipe de campo)'],
-            ['nome'=>'2. Cadastros (assis social e equipe de campo)'],
-            ['nome'=>'3. Elaboração do relatório social (assist social)'],
-            ['nome'=>'4. Levantamentos topográficos individualizados'],
-            ['nome'=>'5. Montagem processo jurídico'],
-            ['nome'=>'6. Atendimentos'],
-            ['nome'=>'7. Finalização do processo de CRF'],
-            ['nome'=>'8. Entrega das CRFs à Contratante (SMMAGU/PM CMD)'],
+            ['nome'=>'0. Selagem dos imóveis (topografia + equipe de campo)','ativo'=>'n'],
+            ['nome'=>'1. Cadastros (assis social e equipe de campo)','ativo'=>'s'],
+            ['nome'=>'2. Elaboração do relatório social (assist social)','ativo'=>'s'],
+            ['nome'=>'3. Levantamentos topográficos individualizados','ativo'=>'s'],
+            ['nome'=>'4. Montagem processo jurídico','ativo'=>'s'],
+            ['nome'=>'5. Atendimentos','ativo'=>'s'],
+            ['nome'=>'6. Finalização do processo de CRF','ativo'=>'s'],
+            ['nome'=>'7. Entrega das CRFs à Contratante (SMMAGU/PM CMD)','ativo'=>'s'],
         ];
         foreach ($arr as $key => $value) {
             Etapa::create([
                 'nome'=>$value['nome'],
+                'ativo'=>$value['ativo'],
                 'token'=>uniqid(),
             ]);
         }

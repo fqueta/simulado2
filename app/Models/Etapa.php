@@ -20,4 +20,8 @@ class Etapa extends Model
         'deletado',
         'reg_deletado'
     ];
+    public function familias()
+    {
+        return $this->belongsTo('App\Models\Familia');
+    }
 }
