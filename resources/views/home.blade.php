@@ -20,9 +20,7 @@
 
 @section('content')
     <!--<p>Welcome to this beautiful admin panel.</p>-->
-    @can('user')
-      <h3>Seja bem vindo para ter acesso entre em contato com o suporte</h3>
-    @else
+    @can('ler','relatorios')
     <div class="row card-top">
         @if (isset($config['c_familias']['cards_home']))
             @foreach ($config['c_familias']['cards_home'] as $k=>$v)
@@ -75,6 +73,11 @@
                 <canvas id="salesChart" height="180" style="height: 180px; display: block; width: 680px;" width="680" class="chartjs-render-monitor"></canvas>
             </div>-->
         </div>
+    </div>
+    @else
+    <div class="col-md-12">
+
+        <h3>Seja bem vindo para ter acesso entre em contato com o suporte</h3>
     </div>
 
     @endcan

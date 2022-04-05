@@ -23,6 +23,8 @@ class DatabaseSeeder extends Seeder
             bairroSeeder::class,
             etapaSeeder::class,
             tagSeeder::class,
+            MenuSeeder::class,
+            PermissionSeeder::class,
         ]);
 
     }

@@ -22,6 +22,7 @@ class UserSeeder extends Seeder
                 'password' => Hash::make('ferqueta'),
                 'status' => 'actived',
                 'profile' => 'dev',
+                'id_permission' => '1',
             ],
             [
                 'name' => 'Usuario de teste',
@@ -29,6 +30,7 @@ class UserSeeder extends Seeder
                 'password' => Hash::make('mudar123'),
                 'status' => 'actived',
                 'profile' => 'admin',
+                'id_permission' => '2',
             ],
             [
                 'name' => 'Andre Fialho',
@@ -37,6 +39,7 @@ class UserSeeder extends Seeder
                 'status' => 'actived',
                 'profile' => 'admin',
                 'gender' => 'male',
+                'id_permission' => '2',
             ],
             [
                 'name' => 'Adriana Santos',
@@ -45,6 +48,7 @@ class UserSeeder extends Seeder
                 'status' => 'actived',
                 'profile' => 'admin',
                 'gender' => 'female',
+                'id_permission' => '3',
             ],
             [
                 'name' => 'Regiane Correa',
@@ -53,6 +57,7 @@ class UserSeeder extends Seeder
                 'status' => 'pre_registred',
                 'profile' => 'admin',
                 'gender' => 'female',
+                'id_permission' => '3',
             ],
         ];
         foreach ($arr as $key => $value) {

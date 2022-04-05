@@ -410,8 +410,8 @@ class FamiliaController extends Controller
     }
     public function create(User $user)
     {
-        $this->authorize('is_admin', $user);
-        $title = 'Cadastrar família';
+        $this->authorize('create', $this->routa);
+        $title = 'Cadastrar Lote';
         $titulo = $title;
         //$Users = Users::all();
         //$roles = DB::select("SELECT * FROM roles ORDER BY id ASC");

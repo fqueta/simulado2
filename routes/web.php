@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\admin\UserPermissions;
 use App\Http\Controllers\GerenciarGrupo;
 use App\Http\Controllers\GerenciarUsuarios;
 use App\Http\Controllers\FamiliaController;
@@ -38,6 +39,15 @@ Route::prefix('users')->group(function(){
     Route::get('/{id}/edit',[UserController::class,'edit'])->where('id', '[0-9]+')->name('users.edit');
     Route::put('/{id}',[UserController::class,'update'])->where('id', '[0-9]+')->name('users.update');
     Route::delete('/{id}',[UserController::class,'destroy'])->where('id', '[0-9]+')->name('users.destroy');
+});
+Route::prefix('permissions')->group(function(){
+    Route::get('/',[UserPermissions::class,'index'])->name('permissions.index');
+    Route::get('/create',[UserPermissions::class,'create'])->name('permissions.create');
+    Route::post('/',[UserPermissions::class,'store'])->name('permissions.store');
+    Route::get('/{id}/show',[UserPermissions::class,'show'])->where('id', '[0-9]+')->name('permissions.show');
+    Route::get('/{id}/edit',[UserPermissions::class,'edit'])->where('id', '[0-9]+')->name('permissions.edit');
+    Route::put('/{id}',[UserPermissions::class,'update'])->where('id', '[0-9]+')->name('permissions.update');
+    Route::delete('/{id}',[UserPermissions::class,'destroy'])->where('id', '[0-9]+')->name('permissions.destroy');
 });
 Route::prefix('familias')->group(function(){
     Route::get('/',[FamiliaController::class,'index'])->name('familias.index');
@@ -94,6 +104,22 @@ Route::prefix('etapas')->group(function(){
     Route::post('/{id}',[EtapaController::class,'update'])->where('id', '[0-9]+')->name('etapas.update-ajax');
     Route::delete('/{id}',[EtapaController::class,'destroy'])->where('id', '[0-9]+')->name('etapas.destroy');
 });
+Route::prefix('relatorios')->group(function(){
+    Route::get('/',[EtapaController::class,'index'])->name('relatorios.index');
+    Route::get('/geral',[EtapaController::class,'index'])->name('relatorios.geral');
+    Route::get('/evolucao',[EtapaController::class,'create'])->name('relatorios.evolucao');
+    Route::post('/',[EtapaController::class,'store'])->name('relatorios.store');
+    Route::get('/{id}/show',[EtapaController::class,'show'])->name('relatorios.show');
+    Route::get('/{id}/edit',[EtapaController::class,'edit'])->name('relatorios.edit');
+    Route::put('/{id}',[EtapaController::class,'update'])->where('id', '[0-9]+')->name('relatorios.update');
+    Route::post('/{id}',[EtapaController::class,'update'])->where('id', '[0-9]+')->name('relatorios.update-ajax');
+    Route::delete('/{id}',[EtapaController::class,'destroy'])->where('id', '[0-9]+')->name('relatorios.destroy');
+});
+Route::prefix('sistema')->group(function(){
+    Route::get('/pefil',[EtapaController::class,'index'])->name('sistema.perfil');
+    Route::get('/config',[EtapaController::class,'config'])->name('sistema.config');
+    Route::post('/{id}',[EtapaController::class,'update'])->where('id', '[0-9]+')->name('sistema.update-ajax');
+});
 Route::prefix('uploads')->group(function(){
     Route::get('/',[uploadController::class,'index'])->name('uploads.index');
     Route::get('/create',[UploadController::class,'create'])->name('uploads.create');
@@ -109,6 +135,7 @@ Route::prefix('uploads')->group(function(){
 Route::fallback(function () {
     return view('erro404');
 });
+Route::get('menu/{id}', [App\Http\Controllers\HomeController::class, 'menu'])->name('menu');
 Route::prefix('teste')->group(function(){
     Route::get('/',[App\Http\Controllers\TesteController::class,'index'])->name('teste');
     Route::get('/ajax',[App\Http\Controllers\TesteController::class,'ajax'])->name('teste.ajax');

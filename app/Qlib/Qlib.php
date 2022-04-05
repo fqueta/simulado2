@@ -3,7 +3,8 @@ namespace App\Qlib;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\URL;
-
+use Illuminate\Support\Facades\Auth;
+use App\Models\Permission;
 class Qlib
 {
   public function lib_print($data){
@@ -235,5 +236,26 @@ class Qlib
     }
     static function UrlAtual(){
         return URL::full();
+    }
+    static function ver_PermAdmin($perm=false,$url=false){
+        $ret = false;
+        if(!$url){
+            $url = URL::current();
+            $arr_url = explode('/',$url);
+        }
+        if($url && $perm){
+            $arr_permissions = [];
+            $logado = Auth::user();
+            $id_permission = $logado->id_permission;
+            $dPermission = Permission::findOrFail($id_permission);
+            if($dPermission){
+                $arr_permissions = Qlib::lib_json_array($dPermission->id_menu);
+                if(isset($arr_permissions[$perm][$url])){
+                    $ret = true;
+                }
+            }
+        }
+        return $ret;
+        //echo $url;
     }
 }

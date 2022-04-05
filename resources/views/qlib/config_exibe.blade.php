@@ -35,11 +35,14 @@
                     'option_select'=>false,
                     'class_div'=>'pt-4 text-right',
                 ])}}
+                @can('create',$routa)
+
                 <div class="col-md-2 text-right mt-4">
                     <a href="{{ route($routa.'.create') }}" class="btn btn-success">
                         <i class="fa fa-plus" aria-hidden="true"></i> Cadastrar
                     </a>
                 </div>
+                @endcan
                 <div class="collapse" id="busca-id">
                     @include('qlib.busca')
                 </div>

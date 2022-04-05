@@ -111,7 +111,11 @@
         @endphp
         <div class="col-{{$config['col']}}-{{$config['tam']}} {{$config['class_div']}}" div-id="{{$config['campo']}}">
             @if ($config['script'])
-                @include($config['script'])
+                @if(isset($config['dados']))
+                    @include($config['script'],@$config['dados'])
+                @else
+                    @include($config['script'])
+                @endif
             @endif
         </div>
     @else
