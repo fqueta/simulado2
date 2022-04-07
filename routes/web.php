@@ -41,6 +41,7 @@ Route::prefix('users')->group(function(){
     Route::put('/{id}',[UserController::class,'update'])->where('id', '[0-9]+')->name('users.update');
     Route::delete('/{id}',[UserController::class,'destroy'])->where('id', '[0-9]+')->name('users.destroy');
 });
+/*
 Route::prefix('permissions')->group(function(){
     Route::get('/',[UserPermissions::class,'index'])->name('permissions.index');
     Route::get('/create',[UserPermissions::class,'create'])->name('permissions.create');
@@ -49,7 +50,7 @@ Route::prefix('permissions')->group(function(){
     Route::get('/{id}/edit',[UserPermissions::class,'edit'])->where('id', '[0-9]+')->name('permissions.edit');
     Route::put('/{id}',[UserPermissions::class,'update'])->where('id', '[0-9]+')->name('permissions.update');
     Route::delete('/{id}',[UserPermissions::class,'destroy'])->where('id', '[0-9]+')->name('permissions.destroy');
-});
+});*/
 Route::prefix('familias')->group(function(){
     Route::get('/',[FamiliaController::class,'index'])->name('familias.index');
     Route::get('/create',[FamiliaController::class,'create'])->name('familias.create');
@@ -149,7 +150,27 @@ Auth::routes();
 Route::get('/',function(){
   return redirect()->route('login');
 });
-
+Route::prefix('admin')->group(function(){
+    Route::get('/home', [App\Http\Controllers\admin\homeController::class, 'index'])->name('home.admin');
+    Route::resource('cursos','\App\Http\Controllers\admin\CursosController',['parameters' => [
+        'cursos' => 'id'
+    ]]);
+    Route::resource('categorias','\App\Http\Controllers\admin\CategoriasController',['parameters' => [
+        'categorias' => 'id'
+    ]]);
+    Route::resource('modulos','\App\Http\Controllers\admin\ModulosController',['parameters' => [
+        'modulos' => 'id'
+    ]]);
+    Route::resource('provas','\App\Http\Controllers\admin\ProvasController',['parameters' => [
+        'questoes' => 'id'
+    ]]);
+    Route::resource('questoes','\App\Http\Controllers\admin\QuestoesController',['parameters' => [
+        'questoes' => 'id'
+    ]]);
+    Route::resource('permissions','\App\Http\Controllers\admin\UserPermissions',['parameters' => [
+        'permissions' => 'id'
+    ]]);
+});
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
 Route::get('envio-mails',function(){

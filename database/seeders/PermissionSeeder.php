@@ -17,17 +17,17 @@ class PermissionSeeder extends Seeder
         $arrPermiss = [
             "master"=>
             [
-                "ler"=>["cadastros"=>"s","familias"=>"s","bairros"=>"s","etapas"=>"s","escolaridades"=>"s","estado-civil"=>"s","relatorios"=>"s","relatorios_geral"=>"s","relatorios_evolucao"=>"s","config"=>"s","sistema"=>"s","users"=>"s","permissions"=>"s"],
-                "create"=>["familias"=>"s","bairros"=>"s","etapas"=>"s","escolaridades"=>"s","estado-civil"=>"s","relatorios_geral"=>"s","relatorios_evolucao"=>"s","sistema"=>"s","users"=>"s","permissions"=>"s"],
-                "update"=>["familias"=>"s","bairros"=>"s","etapas"=>"s","escolaridades"=>"s","estado-civil"=>"s","relatorios_geral"=>"s","relatorios_evolucao"=>"s","sistema"=>"s","users"=>"s","permissions"=>"s"],
-                "delete"=>["familias"=>"s","bairros"=>"s","etapas"=>"s","escolaridades"=>"s","estado-civil"=>"s","relatorios_geral"=>"s","relatorios_evolucao"=>"s","sistema"=>"s","users"=>"s","permissions"=>"s"]
+                "ler"=>["cad-cursos"=>"s","cursos"=>"s","categorias"=>"s","modulos"=>"s","questoes"=>"s","provas"=>"s","relatorios"=>"s","relatorios_geral"=>"s","relatorios_evolucao"=>"s","config"=>"s","sistema"=>"s","users"=>"s","permissions"=>"s"],
+                "create"=>["cursos"=>"s","categorias"=>"s","modulos"=>"s","questoes"=>"s","provas"=>"s","relatorios_geral"=>"s","relatorios_evolucao"=>"s","sistema"=>"s","users"=>"s","permissions"=>"s"],
+                "update"=>["cursos"=>"s","categorias"=>"s","modulos"=>"s","questoes"=>"s","provas"=>"s","relatorios_geral"=>"s","relatorios_evolucao"=>"s","sistema"=>"s","users"=>"s","permissions"=>"s"],
+                "delete"=>["cursos"=>"s","categorias"=>"s","modulos"=>"s","questoes"=>"s","provas"=>"s","relatorios_geral"=>"s","relatorios_evolucao"=>"s","sistema"=>"s","users"=>"s","permissions"=>"s"]
             ],
             "admin"=>
             [
-                "ler"=>["cadastros"=>"s","familias"=>"s","bairros"=>"s","etapas"=>"s","escolaridades"=>"s","estado-civil"=>"s","relatorios"=>"n","relatorios_geral"=>"n","relatorios_evolucao"=>"n","config"=>"s","sistema"=>"n","users"=>"s","permissions"=>"s"],
-                "create"=>["familias"=>"s","bairros"=>"s","etapas"=>"s","escolaridades"=>"s","estado-civil"=>"s","relatorios_geral"=>"s","relatorios_evolucao"=>"s","sistema"=>"s","users"=>"s","permissions"=>"s"],
-                "update"=>["familias"=>"s","bairros"=>"s","etapas"=>"s","escolaridades"=>"s","estado-civil"=>"s","relatorios_geral"=>"s","relatorios_evolucao"=>"s","sistema"=>"s","users"=>"s","permissions"=>"s"],
-                "delete"=>["familias"=>"s","bairros"=>"s","etapas"=>"s","escolaridades"=>"s","estado-civil"=>"s","relatorios_geral"=>"s","relatorios_evolucao"=>"s","sistema"=>"s","users"=>"s","permissions"=>"s"]
+                "ler"=>["cad-cursos"=>"s","cursos"=>"s","categorias"=>"s","modulos"=>"s","questoes"=>"s","provas"=>"s","relatorios"=>"n","relatorios_geral"=>"n","relatorios_evolucao"=>"n","config"=>"s","sistema"=>"n","users"=>"s","permissions"=>"s"],
+                "create"=>["cursos"=>"s","categorias"=>"s","modulos"=>"s","questoes"=>"s","provas"=>"s","relatorios_geral"=>"s","relatorios_evolucao"=>"s","sistema"=>"s","users"=>"s","permissions"=>"s"],
+                "update"=>["cursos"=>"s","categorias"=>"s","modulos"=>"s","questoes"=>"s","provas"=>"s","relatorios_geral"=>"s","relatorios_evolucao"=>"s","sistema"=>"s","users"=>"s","permissions"=>"s"],
+                "delete"=>["cursos"=>"s","categorias"=>"s","modulos"=>"s","questoes"=>"s","provas"=>"s","relatorios_geral"=>"s","relatorios_evolucao"=>"s","sistema"=>"s","users"=>"s","permissions"=>"s"]
             ],
         ];
         DB::table('permissions')->insert([
@@ -56,7 +56,7 @@ class PermissionSeeder extends Seeder
                 'id_menu'=>json_encode([]),
             ],
             [
-                'name'=>'Usuário',
+                'name'=>'Alunos',
                 'description'=>'Somente clientes, Sem privilêgios de administração acesso a área restrita do site','active'=>'s',
                 'id_menu'=>json_encode([]),
             ],
