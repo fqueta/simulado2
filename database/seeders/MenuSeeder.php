@@ -17,57 +17,57 @@ class MenuSeeder extends Seeder
         DB::table('menus')->insert([
             [
                 'categoria'=>'CADASTROS',
-                'description'=>'Cadastros de Lotes',
+                'description'=>'Cursos',
                 'icon'=>'fas fa-copy',
                 'actived'=>true,
-                'url'=>'cadastros',
+                'url'=>'cad-cursos',
                 'route'=>'',
                 'pai'=>''
             ],
             [
                 'categoria'=>'',
-                'description'=>'Todos Lotes',
+                'description'=>'Todos Cursos',
                 'icon'=>'fas fa-list',
                 'actived'=>true,
-                'url'=>'familias',
-                'route'=>'familias.index',
-                'pai'=>'cadastros'
+                'url'=>'cursos',
+                'route'=>'cursos.index',
+                'pai'=>'cad-cursos'
             ],
             [
                 'categoria'=>'',
-                'description'=>'Bairros',
+                'description'=>'Categoria',
                 'icon'=>'fas fa-list',
                 'actived'=>true,
-                'url'=>'bairros',
-                'route'=>'bairros.index',
-                'pai'=>'cadastros'
+                'url'=>'categorias',
+                'route'=>'categorias.index',
+                'pai'=>'cad-cursos'
             ],
             [
                 'categoria'=>'',
-                'description'=>'Etapas',
+                'description'=>'Modulos',
                 'icon'=>'fas fa-list',
                 'actived'=>true,
-                'url'=>'etapas',
-                'route'=>'etapas.index',
-                'pai'=>'cadastros'
+                'url'=>'modulos',
+                'route'=>'modulos.index',
+                'pai'=>'cad-cursos'
             ],
             [
                 'categoria'=>'',
-                'description'=>'Escolaridade',
+                'description'=>'Provas',
                 'icon'=>'fas fa-list',
                 'actived'=>true,
-                'url'=>'escolaridades',
-                'route'=>'escolaridades.index',
-                'pai'=>'cadastros'
+                'url'=>'provas',
+                'route'=>'provas.index',
+                'pai'=>'cad-cursos'
             ],
             [
                 'categoria'=>'',
-                'description'=>'Estado civil',
+                'description'=>'Questões',
                 'icon'=>'fas fa-list',
                 'actived'=>true,
-                'url'=>'estado-civil',
-                'route'=>'estado-civil.index',
-                'pai'=>'cadastros'
+                'url'=>'questoes',
+                'route'=>'questoes.index',
+                'pai'=>'cad-cursos'
             ],
             [
                 'categoria'=>'',
