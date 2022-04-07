@@ -37,9 +37,6 @@
             @can('is_admin')
             <div class="card-tools d-flex d-print-none">
                     @include('bairros.dropdow_actions')
-                    <a href="{{ route('bairros.create') }}" class="btn btn-success">
-                        <i class="fa fa-plus" aria-hidden="true"></i> Cadastrar bairro
-                    </a>
             </div>
             @endcan
         </div>

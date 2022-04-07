@@ -3,7 +3,6 @@
         <script src="{{url('/')}}/js/dropzone.min.js"></script>
         <link rel="stylesheet" href="{{url('/')}}/css/dropzone.min.css" type="text/css" />
         <!-- Button trigger modal -->
-
         <div class="row">
             <div class="col-md-12 mb-2">
                 <span id="lista-files">
@@ -12,14 +11,18 @@
                         'token_produto'=>$config['token_produto'],
                         'tipo'=>'list',
                         'listFiles'=>@$config['listFiles'],
+                        'routa'=>@$config['routa'],
                         ])}}
 
                 </span>
             </div>
             <div class="col-md-12">
-                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modelId"> <i class="fas fa-upload"></i>
-                    {{ __('Enviar arquivos') }}
-                </button>
+                @can('create',$config['routa'])
+                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modelId"> <i class="fas fa-upload"></i>
+                        {{ __('Enviar arquivos') }}
+                    </button>
+                @endcan
+
             </div>
         </div>
 
@@ -72,7 +75,9 @@
             <a href="{{url('/storage')}}/{{$vl['pasta']}}" target="_blank" rel="noopener noreferrer">
               <span class="pull-left"><i class="fas fa-file-{{$vl['tipo_icon']}} fa-2x"></i></span> {{$vl['nome']}}
             </a>
-        <button type="button" onclick="excluirArquivo('{{$vl['id']}}','{{route('uploads.destroy',['id'=>$vl['id']])}}')" class="btn btn-default" title="Excluir"><i class="fas fa-trash "></i></button type="button">
+            @can('delete',$config['routa'])
+                <button type="button" onclick="excluirArquivo('{{$vl['id']}}','{{route('uploads.destroy',['id'=>$vl['id']])}}')" class="btn btn-default" title="Excluir"><i class="fas fa-trash "></i></button type="button">
+            @endcan
         </li>
         @endforeach
     </ul>

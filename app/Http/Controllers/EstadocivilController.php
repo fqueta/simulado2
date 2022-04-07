@@ -15,12 +15,14 @@ class EstadocivilController extends Controller
     protected $user;
     public $routa;
     public $label;
+    public $view;
     public function __construct(User $user)
     {
         $this->middleware('auth');
         $this->user = $user;
-        $this->routa = 'estadocivils';
+        $this->routa = 'estado-civil';
         $this->label = 'Estado civil';
+        $this->view = 'padrao';
     }
     public function queryEstadocivil($get=false,$config=false)
     {
@@ -114,7 +116,7 @@ class EstadocivilController extends Controller
         $queryEstadocivil = $this->queryEstadocivil($_GET);
         $queryEstadocivil['config']['exibe'] = 'html';
         $routa = $this->routa;
-        return view($routa.'.index',[
+        return view($this->view.'.index',[
             'dados'=>$queryEstadocivil['estadocivil'],
             'title'=>$title,
             'titulo'=>$titulo,
@@ -141,7 +143,7 @@ class EstadocivilController extends Controller
             'token'=>uniqid(),
         ];
         $campos = $this->campos();
-        return view($this->routa.'.createedit',[
+        return view($this->view.'.createedit',[
             'config'=>$config,
             'title'=>$title,
             'titulo'=>$titulo,
@@ -151,6 +153,7 @@ class EstadocivilController extends Controller
     }
     public function store(Request $request)
     {
+        $this->authorize('create', $this->routa);
         $validatedData = $request->validate([
             'nome' => ['required','string','unique:estadocivils'],
         ]);
@@ -171,6 +174,7 @@ class EstadocivilController extends Controller
 
         if($ajax=='s'){
             $ret['return'] = route($route).'?idCad='.$salvar->id;
+            $ret['redirect'] = route($this->routa.'.edit',['id'=>$salvar->id]);
             return response()->json($ret);
         }else{
             return redirect()->route($route,$ret);
@@ -187,7 +191,7 @@ class EstadocivilController extends Controller
         $id = $estadocivil;
         $dados = Estadocivil::where('id',$id)->get();
         $routa = 'estadocivils';
-        $this->authorize('is_admin', $user);
+        $this->authorize('ler', $this->routa);
 
         if(!empty($dados)){
             $title = 'Editar Cadastro de estadocivils';
@@ -218,7 +222,7 @@ class EstadocivilController extends Controller
                 'exec'=>true,
             ];
 
-            return view($routa.'.createedit',$ret);
+            return view($this->view.'.createedit',$ret);
         }else{
             $ret = [
                 'exec'=>false,
@@ -229,6 +233,7 @@ class EstadocivilController extends Controller
 
     public function update(Request $request, $id)
     {
+        $this->authorize('update', $this->routa);
         $validatedData = $request->validate([
             'nome' => ['required'],
         ]);
@@ -287,6 +292,7 @@ class EstadocivilController extends Controller
 
     public function destroy($id,Request $request)
     {
+        $this->authorize('delete', $this->routa);
         $config = $request->all();
         $ajax =  isset($config['ajax'])?$config['ajax']:'n';
         $routa = 'estadocivils';

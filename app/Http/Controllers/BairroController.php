@@ -118,7 +118,7 @@ class BairroController extends Controller
     }
     public function index(User $user)
     {
-        $this->authorize('is_admin', $user);
+        $this->authorize('ler', $this->routa);
         $title = 'Cidades Cadastradas';
         $titulo = $title;
         $ajax = isset($_GET['ajax'])?$_GET['ajax']:false;
@@ -144,7 +144,7 @@ class BairroController extends Controller
     }
     public function create(User $user)
     {
-        $this->authorize('is_admin', $user);
+        $this->authorize('create', $this->routa);
         $title = 'Cadastrar bairro';
         $titulo = $title;
         $config = [
@@ -166,6 +166,7 @@ class BairroController extends Controller
     }
     public function store(Request $request)
     {
+        $this->authorize('create', $this->routa);
         $validatedData = $request->validate([
             'nome' => ['required','string','unique:bairros'],
         ]);
@@ -202,7 +203,7 @@ class BairroController extends Controller
         $dados = Bairro::where('id',$id)->get();
         $routa = 'bairros';
         $ajax = isset($_GET['ajax'])?$_GET['ajax']:false;
-        $this->authorize('is_admin', $user);
+        $this->authorize('ler', $this->routa);
 
         if(!empty($dados)){
             $title = 'Editar Cadastro de bairros';
@@ -230,6 +231,7 @@ class BairroController extends Controller
                 'titulo'=>$titulo,
                 'listFiles'=>$listFiles,
                 'campos'=>$campos,
+                'routa'=>$this->routa,
                 'exec'=>true,
             ];
             if($ajax=='s'){
@@ -305,6 +307,7 @@ class BairroController extends Controller
 
     public function destroy($id,Request $request)
     {
+        $this->authorize('delete', $this->routa);
         $config = $request->all();
         $ajax =  isset($config['ajax'])?$config['ajax']:'n';
         $routa = 'bairros';

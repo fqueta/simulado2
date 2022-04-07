@@ -51,6 +51,7 @@
                     'token_produto'=>$value['token'],
                     'tab'=>'familias',
                     'listFiles'=>@$listFiles,
+                    'routa'=>@$routa,
                 ])}}
             </div>
         </div>

@@ -232,6 +232,7 @@ class FamiliaController extends Controller
     public function index(User $user)
     {
         $this->authorize('is_admin', $user);
+        $this->authorize('ler', $this->routa);
         $title = 'Famílias Cadastradas';
         $titulo = $title;
         $queryFamilias = $this->queryFamilias($_GET);
@@ -381,9 +382,9 @@ class FamiliaController extends Controller
                 'type'=>'selector',
                 'data_selector'=>[
                     'campos'=>$estadocivil->campos(),
-                    'route_index'=>route('estadocivils.index'),
-                    'id_form'=>'frm-estadocivils',
-                    'action'=>route('estadocivils.store'),
+                    'route_index'=>route('estado-civil.index'),
+                    'id_form'=>'frm-estado-civil',
+                    'action'=>route('estado-civil.store'),
                     'campo_id'=>'id',
                     'campo_bus'=>'nome',
                     'label'=>'Estado Civil',
@@ -438,12 +439,13 @@ class FamiliaController extends Controller
             'arr_estadocivil'=>$arr_estadocivil,
             'campos'=>$campos,
             'value'=>$value,
+            'routa'=>$this->routa,
         ]);
     }
 
     public function store(StoreFamilyRequest $request)
     {
-        //$validated = $request->validated();
+        $this->authorize('create', $this->routa);
         $dados = $request->all();
         $ajax = isset($dados['ajax'])?$dados['ajax']:'n';
         /*
@@ -476,7 +478,7 @@ class FamiliaController extends Controller
 
         if($ajax=='s'){
             $ret['return'] = route($route).'?idCad='.$salvar->id;
-            $ret['redirect'] = route('familias.edit',['id'=>$salvar->id]);
+            $ret['redirect'] = route($this->routa.'.edit',['id'=>$salvar->id]);
             return response()->json($ret);
         }else{
             return redirect()->route($route,$ret);
@@ -493,7 +495,7 @@ class FamiliaController extends Controller
         $dados = Familia::where('id',$id)->get();
         //$roles = DB::select("SELECT * FROM roles ORDER BY id ASC");
         //$permissions = DB::select("SELECT * FROM permissions ORDER BY id ASC");
-        $this->authorize('is_admin', $user);
+        $this->authorize('ler', $this->routa);
 
         if(!empty($dados)){
             $title = 'Editar Cadastro de família';
@@ -542,6 +544,7 @@ class FamiliaController extends Controller
                 'arr_estadocivil'=>$arr_estadocivil,
                 'listFiles'=>$listFiles,
                 'campos'=>$campos,
+                'routa'=>$this->routa,
                 'exec'=>true,
             ];
             return view($this->routa.'.createedit',$ret);

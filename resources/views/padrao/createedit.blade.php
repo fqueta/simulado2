@@ -30,7 +30,6 @@
             </div>
         </div>
     </div>
-    <!--
     <div class="col-md-4">
         <div class="card">
             <div class="card-header">
@@ -42,15 +41,16 @@
                 </div>
             </div>
             <div class="card-body">
-                App\Qlib\Qlib::gerUploadAquivos([
+                {{App\Qlib\Qlib::gerUploadAquivos([
                     'pasta'=>'bairros/'.date('Y').'/'.date('m'),
                     'token_produto'=>$value['token'],
                     'tab'=>'bairros',
                     'listFiles'=>@$listFiles,
+                    'routa'=>@$routa,
                 ])}}
             </div>
         </div>
-    </div>-->
+    </div>
 </div>
 
 @stop
@@ -67,6 +67,7 @@
                 openPageLink(e,$(this).attr('href'),"{{date('Y')}}");
             });
           });
+
     </script>
     @include('qlib.js_submit')
 @stop

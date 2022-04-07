@@ -15,12 +15,14 @@ class EtapaController extends Controller
     protected $user;
     public $routa;
     public $label;
+    public $view;
     public function __construct(User $user)
     {
         $this->middleware('auth');
         $this->user = $user;
         $this->routa = 'etapas';
         $this->label = 'Etapa';
+        $this->view = 'padrao';
     }
     public function queryEtapa($get=false,$config=false)
     {
@@ -109,13 +111,13 @@ class EtapaController extends Controller
     }
     public function index(User $user)
     {
-        $this->authorize('is_admin', $user);
+        $this->authorize('ler', $this->routa);
         $title = 'Etapas Cadastradas';
         $titulo = $title;
         $queryEtapa = $this->queryEtapa($_GET);
         $queryEtapa['config']['exibe'] = 'html';
         $routa = $this->routa;
-        return view($routa.'.index',[
+        return view($this->view.'.index',[
             'dados'=>$queryEtapa['etapa'],
             'title'=>$title,
             'titulo'=>$titulo,
@@ -130,7 +132,7 @@ class EtapaController extends Controller
     }
     public function create(User $user)
     {
-        $this->authorize('is_admin', $user);
+        $this->authorize('create', $this->routa);
         $title = 'Cadastrar etapa';
         $titulo = $title;
         $config = [
@@ -142,7 +144,7 @@ class EtapaController extends Controller
             'token'=>uniqid(),
         ];
         $campos = $this->campos();
-        return view($this->routa.'.createedit',[
+        return view($this->view.'.createedit',[
             'config'=>$config,
             'title'=>$title,
             'titulo'=>$titulo,
@@ -172,6 +174,7 @@ class EtapaController extends Controller
 
         if($ajax=='s'){
             $ret['return'] = route($route).'?idCad='.$salvar->id;
+            $ret['redirect'] = route($this->routa.'.edit',['id'=>$salvar->id]);
             return response()->json($ret);
         }else{
             return redirect()->route($route,$ret);
@@ -188,7 +191,7 @@ class EtapaController extends Controller
         $id = $etapa;
         $dados = Etapa::where('id',$id)->get();
         $routa = 'etapas';
-        $this->authorize('is_admin', $user);
+        $this->authorize('ler', $this->routa);
 
         if(!empty($dados)){
             $title = 'Editar Cadastro de etapas';
@@ -219,12 +222,12 @@ class EtapaController extends Controller
                 'exec'=>true,
             ];
 
-            return view($routa.'.createedit',$ret);
+            return view($this->view.'.createedit',$ret);
         }else{
             $ret = [
                 'exec'=>false,
             ];
-            return redirect()->route($routa.'.index',$ret);
+            return redirect()->route($this->view.'.index',$ret);
         }
     }
 
@@ -288,14 +291,15 @@ class EtapaController extends Controller
 
     public function destroy($id,Request $request)
     {
+        $this->authorize('delete', $this->routa);
         $config = $request->all();
         $ajax =  isset($config['ajax'])?$config['ajax']:'n';
         $routa = 'etapas';
         if (!$post = Etapa::find($id)){
             if($ajax=='s'){
-                $ret = response()->json(['mens'=>'Registro não encontrado!','color'=>'danger','return'=>route($this->routa.'.index')]);
+                $ret = response()->json(['mens'=>'Registro não encontrado!','color'=>'danger','return'=>route($this->view.'.index')]);
             }else{
-                $ret = redirect()->route($routa.'.index',['mens'=>'Registro não encontrado!','color'=>'danger']);
+                $ret = redirect()->route($this->view.'.index',['mens'=>'Registro não encontrado!','color'=>'danger']);
             }
             return $ret;
         }

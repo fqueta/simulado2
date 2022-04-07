@@ -37,12 +37,14 @@ class AuthServiceProvider extends ServiceProvider
 
         Gate::define('ler', function($user,$pagina=false){
             $ret = false;
-            if($pagina){
-                $qlib = Qlib::ver_permAdmin('ler',$pagina);
-                if($qlib){
-                    $ret = Response::allow();
-                }else{
-                    $ret = Response::deny('Usuário sem autorização');
+            if($user->ativo=='s'){
+                if($pagina){
+                    $qlib = Qlib::ver_permAdmin('ler',$pagina);
+                    if($qlib){
+                        $ret = Response::allow();
+                    }else{
+                        $ret = Response::deny('Usuário sem autorização');
+                    }
                 }
             }
             return $ret;

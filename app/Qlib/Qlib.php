@@ -248,7 +248,7 @@ class Qlib
             $logado = Auth::user();
             $id_permission = $logado->id_permission;
             $dPermission = Permission::findOrFail($id_permission);
-            if($dPermission){
+            if($dPermission && $dPermission->active=='s'){
                 $arr_permissions = Qlib::lib_json_array($dPermission->id_menu);
                 if(isset($arr_permissions[$perm][$url])){
                     $ret = true;
@@ -256,6 +256,5 @@ class Qlib
             }
         }
         return $ret;
-        //echo $url;
     }
 }

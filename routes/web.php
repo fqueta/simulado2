@@ -13,6 +13,7 @@ use App\Http\Controllers\EtapaController;
 use App\Http\Controllers\EscolaridadeController;
 use App\Http\Controllers\EstadocivilController;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 
 /*
 |--------------------------------------------------------------------------
@@ -74,7 +75,7 @@ Route::prefix('bairros')->group(function(){
     Route::get('export/filter', [BairroController::class, 'exportFilter'])->name('bairros.export_filter');
 });
 
-Route::prefix('escolaridade')->group(function(){
+Route::prefix('escolaridades')->group(function(){
     Route::get('/',[EscolaridadeController::class,'index'])->name('escolaridades.index');
     Route::get('/create',[EscolaridadeController::class,'create'])->name('escolaridades.create');
     Route::post('/',[EscolaridadeController::class,'store'])->name('escolaridades.store');
@@ -85,14 +86,14 @@ Route::prefix('escolaridade')->group(function(){
     Route::delete('/{id}',[EscolaridadeController::class,'destroy'])->where('id', '[0-9]+')->name('escolaridades.destroy');
 });
 Route::prefix('estado-civil')->group(function(){
-    Route::get('/',[EstadocivilController::class,'index'])->name('estadocivils.index');
-    Route::get('/create',[EstadocivilController::class,'create'])->name('estadocivils.create');
-    Route::post('/',[EstadocivilController::class,'store'])->name('estadocivils.store');
-    Route::get('/{id}/show',[EstadocivilController::class,'show'])->name('estadocivils.show');
-    Route::get('/{id}/edit',[EstadocivilController::class,'edit'])->name('estadocivils.edit');
-    Route::put('/{id}',[EstadocivilController::class,'update'])->where('id', '[0-9]+')->name('estadocivils.update');
-    Route::post('/{id}',[EstadocivilController::class,'update'])->where('id', '[0-9]+')->name('estadocivils.update-ajax');
-    Route::delete('/{id}',[EstadocivilController::class,'destroy'])->where('id', '[0-9]+')->name('estadocivils.destroy');
+    Route::get('/',[EstadocivilController::class,'index'])->name('estado-civil.index');
+    Route::get('/create',[EstadocivilController::class,'create'])->name('estado-civil.create');
+    Route::post('/',[EstadocivilController::class,'store'])->name('estado-civil.store');
+    Route::get('/{id}/show',[EstadocivilController::class,'show'])->name('estado-civil.show');
+    Route::get('/{id}/edit',[EstadocivilController::class,'edit'])->name('estado-civil.edit');
+    Route::put('/{id}',[EstadocivilController::class,'update'])->where('id', '[0-9]+')->name('estado-civil.update');
+    Route::post('/{id}',[EstadocivilController::class,'update'])->where('id', '[0-9]+')->name('estado-civil.update-ajax');
+    Route::delete('/{id}',[EstadocivilController::class,'destroy'])->where('id', '[0-9]+')->name('estado-civil.destroy');
 });
 Route::prefix('etapas')->group(function(){
     Route::get('/',[EtapaController::class,'index'])->name('etapas.index');
@@ -148,4 +149,14 @@ Auth::routes();
 Route::get('/',function(){
   return redirect()->route('login');
 });
+
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+
+Route::get('envio-mails',function(){
+    $user = new stdClass();
+    $user->name = 'Fernando Queta';
+    $user->email = 'ferqueta@yahoo.com.br';
+    //return new \App\Mail\dataBrasil($user);
+    $enviar = Mail::send(new \App\Mail\dataBrasil($user));
+    return $enviar;
+});

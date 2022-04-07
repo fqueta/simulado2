@@ -21,6 +21,7 @@ class EscolaridadeController extends Controller
         $this->user = $user;
         $this->routa = 'escolaridades';
         $this->label = 'Escolaridade';
+        $this->view = 'padrao';
     }
     public function queryEscolaridade($get=false,$config=false)
     {
@@ -108,13 +109,13 @@ class EscolaridadeController extends Controller
     }
     public function index(User $user)
     {
-        $this->authorize('is_admin', $user);
+        $this->authorize('ler', $this->routa);
         $title = 'Cadastro de escolaridade';
         $titulo = $title;
         $queryEscolaridade = $this->queryEscolaridade($_GET);
         $queryEscolaridade['config']['exibe'] = 'html';
         $routa = $this->routa;
-        return view($routa.'.index',[
+        return view($this->view.'.index',[
             'dados'=>$queryEscolaridade['escolaridade'],
             'title'=>$title,
             'titulo'=>$titulo,
@@ -129,7 +130,7 @@ class EscolaridadeController extends Controller
     }
     public function create(User $user)
     {
-        $this->authorize('is_admin', $user);
+        $this->authorize('create', $this->routa);
         $title = 'Cadastrar escolaridade';
         $titulo = $title;
         $config = [
@@ -141,7 +142,7 @@ class EscolaridadeController extends Controller
             'token'=>uniqid(),
         ];
         $campos = $this->campos();
-        return view($this->routa.'.createedit',[
+        return view($this->view.'.createedit',[
             'config'=>$config,
             'title'=>$title,
             'titulo'=>$titulo,
@@ -151,6 +152,7 @@ class EscolaridadeController extends Controller
     }
     public function store(Request $request)
     {
+        $this->authorize('create', $this->routa);
         $validatedData = $request->validate([
             'nome' => ['required','string','unique:escolaridades'],
         ]);
@@ -171,6 +173,7 @@ class EscolaridadeController extends Controller
 
         if($ajax=='s'){
             $ret['return'] = route($route).'?idCad='.$salvar->id;
+            $ret['redirect'] = route($this->routa.'.edit',['id'=>$salvar->id]);
             return response()->json($ret);
         }else{
             return redirect()->route($route,$ret);
@@ -187,7 +190,7 @@ class EscolaridadeController extends Controller
         $id = $escolaridade;
         $dados = Escolaridade::where('id',$id)->get();
         $routa = 'escolaridades';
-        $this->authorize('is_admin', $user);
+        $this->authorize('ler', $this->routa);
 
         if(!empty($dados)){
             $title = 'Editar cadastro de escolaridade';
@@ -218,7 +221,7 @@ class EscolaridadeController extends Controller
                 'exec'=>true,
             ];
 
-            return view($routa.'.createedit',$ret);
+            return view($this->view.'.createedit',$ret);
         }else{
             $ret = [
                 'exec'=>false,
@@ -229,6 +232,7 @@ class EscolaridadeController extends Controller
 
     public function update(Request $request, $id)
     {
+        $this->authorize('update', $this->routa);
         $validatedData = $request->validate([
             'nome' => ['required'],
         ]);
@@ -287,9 +291,10 @@ class EscolaridadeController extends Controller
 
     public function destroy($id,Request $request)
     {
+        $this->authorize('delete', $this->routa);
         $config = $request->all();
         $ajax =  isset($config['ajax'])?$config['ajax']:'n';
-        $routa = 'escolaridades';
+        $routa = $this->routa;
         if (!$post = Escolaridade::find($id)){
             if($ajax=='s'){
                 $ret = response()->json(['mens'=>'Registro não encontrado!','color'=>'danger','return'=>route($this->routa.'.index')]);

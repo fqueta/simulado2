@@ -56,7 +56,7 @@ class MenuSeeder extends Seeder
                 'description'=>'Escolaridade',
                 'icon'=>'fas fa-list',
                 'actived'=>true,
-                'url'=>'escolaridade',
+                'url'=>'escolaridades',
                 'route'=>'escolaridades.index',
                 'pai'=>'cadastros'
             ],
@@ -66,7 +66,7 @@ class MenuSeeder extends Seeder
                 'icon'=>'fas fa-list',
                 'actived'=>true,
                 'url'=>'estado-civil',
-                'route'=>'estadocivils.index',
+                'route'=>'estado-civil.index',
                 'pai'=>'cadastros'
             ],
             [

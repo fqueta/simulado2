@@ -7,18 +7,17 @@
 @stop
 @section('content')
   <!--<p>Selecione os publicadores do seu familia para enviar o relatorio para o secretário</p>-->
-
   <div class="row">
-    @include('qlib.config_exibe')
-    <div class="col-md-12 mens">
+      @include('qlib.config_exibe')
+      <div class="col-md-12 mens">
     </div>
     @can('is_admin')
-        @include('qlib.partes_html',[
-            'config'=>[
-                'parte'=>'resumo_index',
-                'resumo'=>$config['resumo'],
+    @include('qlib.partes_html',[
+        'config'=>[
+            'parte'=>'resumo_index',
+            'resumo'=>$config['resumo'],
             ]
-        ])
+    ])
     @endcan
     <div class="col-md-12" id="lista">
       <div class="card">
@@ -36,10 +35,7 @@
             </h4>
             @can('is_admin')
             <div class="card-tools d-flex d-print-none">
-                    @include($routa.'.dropdow_actions')
-                    <a href="{{ route($routa.'.create') }}" class="btn btn-success">
-                        <i class="fa fa-plus" aria-hidden="true"></i> Cadastrar
-                    </a>
+                    @include('bairros.dropdow_actions')
             </div>
             @endcan
         </div>
