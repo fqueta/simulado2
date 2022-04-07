@@ -10,7 +10,7 @@ class Permission extends Model
 {
     use HasFactory,Notifiable;
     protected $casts = [
-        'config' => 'id_menu',
+        'id_menu' => 'array',
     ];
     protected $fillable = [
         'name',

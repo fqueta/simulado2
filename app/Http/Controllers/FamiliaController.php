@@ -463,9 +463,9 @@ class FamiliaController extends Controller
         }
         $dados['idoso'] = isset($dados['idoso'])?$dados['idoso']:'n';
         $dados['crianca_adolescente'] = isset($dados['crianca_adolescente'])?$dados['crianca_adolescente']:'n';
-        $dados['renda_familiar'] = $dados['renda_familiar']?$dados['renda_familiar']:'0,00';
         $dados['autor'] = $userLogadon;
         $dados['token'] = uniqid();
+        $dados['renda_familiar'] = $dados['renda_familiar']?$dados['renda_familiar']:'0,00';
         $renda_familiar = str_replace('R$','',$dados['renda_familiar']);
         $dados['renda_familiar'] = Qlib::precoBanco($renda_familiar);
         $salvar = Familia::create($dados);
@@ -478,7 +478,7 @@ class FamiliaController extends Controller
 
         if($ajax=='s'){
             $ret['return'] = route($route).'?idCad='.$salvar->id;
-            $ret['redirect'] = route($this->routa.'.edit',['id'=>$salvar->id]);
+            $ret['redirect'] = route($this->view.'.edit',['id'=>$salvar->id]);
             return response()->json($ret);
         }else{
             return redirect()->route($route,$ret);
@@ -534,7 +534,6 @@ class FamiliaController extends Controller
                     }
                 }
             }
-            //$dados[0]['tags'] = Qlib::lib_json_array($dados[0]['tags']);
             $ret = [
                 'value'=>$dados[0],
                 'config'=>$config,
