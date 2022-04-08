@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateCategoriasTable extends Migration
+class CreateProvasTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,16 +13,23 @@ class CreateCategoriasTable extends Migration
      */
     public function up()
     {
-        Schema::create('categorias', function (Blueprint $table) {
+        Schema::create('provas', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
-            $table->string('token','100')->nullable();
             $table->string('nome',300)->nullable();
+            $table->string('titulo',300)->nullable();
+            $table->string('url',300)->nullable();
+            $table->double('valor',12,2)->nullable();
+            $table->double('matricula',12,2)->nullable();
+            $table->integer('parcelas')->nullable();
+            $table->string('token','100')->nullable();
             $table->enum('ativo',['s','n']);
-            $table->integer('url')->nullable();
-            $table->integer('pai')->nullable();
+            $table->enum('destaque',['n','s']);
             $table->integer('autor')->nullable();
+            $table->longText('descricao')->nullable();
             $table->longText('obs')->nullable();
+            $table->json('conteudo')->nullable();
+            $table->json('config')->nullable();
             $table->enum('excluido',['n','s']);
             $table->text('reg_excluido')->nullable();
             $table->enum('deletado',['n','s']);
@@ -37,6 +44,6 @@ class CreateCategoriasTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('categorias');
+        Schema::dropIfExists('provas');
     }
 }

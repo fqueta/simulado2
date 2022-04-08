@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateCategoriasTable extends Migration
+class CreateModulosTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,7 @@ class CreateCategoriasTable extends Migration
      */
     public function up()
     {
-        Schema::create('categorias', function (Blueprint $table) {
+        Schema::create('modulos', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
             $table->string('token','100')->nullable();
@@ -23,6 +23,7 @@ class CreateCategoriasTable extends Migration
             $table->integer('pai')->nullable();
             $table->integer('autor')->nullable();
             $table->longText('obs')->nullable();
+            $table->json('conteudo')->nullable();
             $table->enum('excluido',['n','s']);
             $table->text('reg_excluido')->nullable();
             $table->enum('deletado',['n','s']);
@@ -37,6 +38,6 @@ class CreateCategoriasTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('categorias');
+        Schema::dropIfExists('modulos');
     }
 }

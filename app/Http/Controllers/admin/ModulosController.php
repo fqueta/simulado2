@@ -5,13 +5,13 @@ namespace App\Http\Controllers\admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use stdClass;
-use App\Models\categoria;
+use App\Models\modulo;
 use App\Qlib\Qlib;
 use App\Models\User;
 use App\Models\_upload;
 use Illuminate\Support\Facades\Auth;
 
-class CategoriasController extends Controller
+class ModulosController extends Controller
 {
     protected $user;
     public $routa;
@@ -21,11 +21,11 @@ class CategoriasController extends Controller
     {
         $this->middleware('auth');
         $this->user = $user;
-        $this->routa = 'categorias';
-        $this->label = 'Categoria';
+        $this->routa = 'modulos';
+        $this->label = 'Modulo';
         $this->view = 'admin.padrao';
     }
-    public function queryCategoria($get=false,$config=false)
+    public function queryModulo($get=false,$config=false)
     {
         $ret = false;
         $get = isset($_GET) ? $_GET:[];
@@ -37,11 +37,11 @@ class CategoriasController extends Controller
             'order'=>isset($get['order']) ? $get['order']: 'desc',
         ];
 
-        $categoria =  Categoria::where('excluido','=','n')->where('deletado','=','n')->orderBy('id',$config['order']);
-        //$categoria =  DB::table('categorias')->where('excluido','=','n')->where('deletado','=','n')->orderBy('id',$config['order']);
+        $modulo =  Modulo::where('excluido','=','n')->where('deletado','=','n')->orderBy('id',$config['order']);
+        //$modulo =  DB::table('modulos')->where('excluido','=','n')->where('deletado','=','n')->orderBy('id',$config['order']);
 
-        $categoria_totais = new stdClass;
-        $campos = isset($_SESSION['campos_categorias_exibe']) ? $_SESSION['campos_categorias_exibe'] : $this->campos();
+        $modulo_totais = new stdClass;
+        $campos = isset($_SESSION['campos_modulos_exibe']) ? $_SESSION['campos_modulos_exibe'] : $this->campos();
         $tituloTabela = 'Lista de todos cadastros';
         $arr_titulo = false;
         if(isset($get['filter'])){
@@ -50,11 +50,11 @@ class CategoriasController extends Controller
                 foreach ($get['filter'] as $key => $value) {
                     if(!empty($value)){
                         if($key=='id'){
-                            $categoria->where($key,'LIKE', $value);
+                            $modulo->where($key,'LIKE', $value);
                             $titulo_tab .= 'Todos com *'. $campos[$key]['label'] .'% = '.$value.'& ';
                             $arr_titulo[$campos[$key]['label']] = $value;
                         }else{
-                            $categoria->where($key,'LIKE','%'. $value. '%');
+                            $modulo->where($key,'LIKE','%'. $value. '%');
                             if($campos[$key]['type']=='select'){
                                 $value = $campos[$key]['arr_opc'][$value];
                             }
@@ -68,36 +68,36 @@ class CategoriasController extends Controller
                     $tituloTabela = 'Lista de: &'.$titulo_tab;
                                 //$arr_titulo = explode('&',$tituloTabela);
                 }
-                $fm = $categoria;
+                $fm = $modulo;
                 if($config['limit']=='todos'){
-                    $categoria = $categoria->get();
+                    $modulo = $modulo->get();
                 }else{
-                    $categoria = $categoria->paginate($config['limit']);
+                    $modulo = $modulo->paginate($config['limit']);
                 }
         }else{
-            $fm = $categoria;
+            $fm = $modulo;
             if($config['limit']=='todos'){
-                $categoria = $categoria->get();
+                $modulo = $modulo->get();
             }else{
-                $categoria = $categoria->paginate($config['limit']);
+                $modulo = $modulo->paginate($config['limit']);
             }
         }
-        $categoria_totais->todos = $fm->count();
-        $categoria_totais->esteMes = $fm->whereYear('created_at', '=', $ano)->whereMonth('created_at','=',$mes)->get()->count();
-        $categoria_totais->ativos = $fm->where('ativo','=','s')->get()->count();
-        $categoria_totais->inativos = $fm->where('ativo','=','n')->get()->count();
+        $modulo_totais->todos = $fm->count();
+        $modulo_totais->esteMes = $fm->whereYear('created_at', '=', $ano)->whereMonth('created_at','=',$mes)->get()->count();
+        $modulo_totais->ativos = $fm->where('ativo','=','s')->get()->count();
+        $modulo_totais->inativos = $fm->where('ativo','=','n')->get()->count();
 
-        $ret['categoria'] = $categoria;
-        $ret['categoria_totais'] = $categoria_totais;
+        $ret['modulo'] = $modulo;
+        $ret['modulo_totais'] = $modulo_totais;
         $ret['arr_titulo'] = $arr_titulo;
         $ret['campos'] = $campos;
         $ret['config'] = $config;
         $ret['tituloTabela'] = $tituloTabela;
         $ret['config']['resumo'] = [
-            'todos_registro'=>['label'=>'Todos cadastros','value'=>$categoria_totais->todos,'icon'=>'fas fa-calendar'],
-            'todos_mes'=>['label'=>'Cadastros recentes','value'=>$categoria_totais->esteMes,'icon'=>'fas fa-calendar-times'],
-            'todos_ativos'=>['label'=>'Cadastros ativos','value'=>$categoria_totais->ativos,'icon'=>'fas fa-check'],
-            'todos_inativos'=>['label'=>'Cadastros inativos','value'=>$categoria_totais->inativos,'icon'=>'fas fa-archive'],
+            'todos_registro'=>['label'=>'Todos cadastros','value'=>$modulo_totais->todos,'icon'=>'fas fa-calendar'],
+            'todos_mes'=>['label'=>'Cadastros recentes','value'=>$modulo_totais->esteMes,'icon'=>'fas fa-calendar-times'],
+            'todos_ativos'=>['label'=>'Cadastros ativos','value'=>$modulo_totais->ativos,'icon'=>'fas fa-check'],
+            'todos_inativos'=>['label'=>'Cadastros inativos','value'=>$modulo_totais->inativos,'icon'=>'fas fa-archive'],
         ];
         return $ret;
     }
@@ -106,7 +106,7 @@ class CategoriasController extends Controller
         return [
             'id'=>['label'=>'Id','active'=>true,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
             'token'=>['label'=>'token','active'=>false,'type'=>'hidden','exibe_busca'=>'d-block','event'=>'','tam'=>'2'],
-            'nome'=>['label'=>'Nome da Categoria','active'=>true,'placeholder'=>'Ex.: Cadastrado','type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'12'],
+            'nome'=>['label'=>'Nome da Modulo','active'=>true,'placeholder'=>'Ex.: Cadastrado','type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'12'],
             'ativo'=>['label'=>'Ativar','active'=>true,'type'=>'chave_checkbox','value'=>'s','valor_padrao'=>'s','exibe_busca'=>'d-block','event'=>'','tam'=>'3','arr_opc'=>['s'=>'Sim','n'=>'Não']],
             'obs'=>['label'=>'Observação','active'=>false,'type'=>'textarea','exibe_busca'=>'d-block','event'=>'','tam'=>'12'],
         ];
@@ -114,20 +114,20 @@ class CategoriasController extends Controller
     public function index(User $user)
     {
         $this->authorize('ler', $this->routa);
-        $title = 'Categorias Cadastradas';
+        $title = 'Modulos Cadastradas';
         $titulo = $title;
-        $queryCategoria = $this->queryCategoria($_GET);
-        $queryCategoria['config']['exibe'] = 'html';
+        $queryModulo = $this->queryModulo($_GET);
+        $queryModulo['config']['exibe'] = 'html';
         $routa = $this->routa;
         return view($this->view.'.index',[
-            'dados'=>$queryCategoria['categoria'],
+            'dados'=>$queryModulo['modulo'],
             'title'=>$title,
             'titulo'=>$titulo,
-            'campos_tabela'=>$queryCategoria['campos'],
-            'categoria_totais'=>$queryCategoria['categoria_totais'],
-            'titulo_tabela'=>$queryCategoria['tituloTabela'],
-            'arr_titulo'=>$queryCategoria['arr_titulo'],
-            'config'=>$queryCategoria['config'],
+            'campos_tabela'=>$queryModulo['campos'],
+            'modulo_totais'=>$queryModulo['modulo_totais'],
+            'titulo_tabela'=>$queryModulo['tituloTabela'],
+            'arr_titulo'=>$queryModulo['arr_titulo'],
+            'config'=>$queryModulo['config'],
             'routa'=>$routa,
             'view'=>$this->view,
             'i'=>0,
@@ -136,11 +136,11 @@ class CategoriasController extends Controller
     public function create(User $user)
     {
         $this->authorize('create', $this->routa);
-        $title = 'Cadastrar categoria';
+        $title = 'Cadastrar modulo';
         $titulo = $title;
         $config = [
             'ac'=>'cad',
-            'frm_id'=>'frm-categorias',
+            'frm_id'=>'frm-modulos',
             'route'=>$this->routa,
         ];
         $value = [
@@ -158,14 +158,14 @@ class CategoriasController extends Controller
     public function store(Request $request)
     {
         $validatedData = $request->validate([
-            'nome' => ['required','string','unique:categorias'],
+            'nome' => ['required','string','unique:modulos'],
         ]);
         $dados = $request->all();
         $ajax = isset($dados['ajax'])?$dados['ajax']:'n';
         $dados['ativo'] = isset($dados['ativo'])?$dados['ativo']:'n';
 
         //dd($dados);
-        $salvar = Categoria::create($dados);
+        $salvar = Modulo::create($dados);
         $route = $this->routa.'.index';
         $ret = [
             'mens'=>$this->label.' cadastrada com sucesso!',
@@ -189,15 +189,15 @@ class CategoriasController extends Controller
         //
     }
 
-    public function edit($categoria,User $user)
+    public function edit($modulo,User $user)
     {
-        $id = $categoria;
-        $dados = Categoria::where('id',$id)->get();
-        $routa = 'categorias';
+        $id = $modulo;
+        $dados = Modulo::where('id',$id)->get();
+        $routa = 'modulos';
         $this->authorize('ler', $this->routa);
 
         if(!empty($dados)){
-            $title = 'Editar Cadastro de categorias';
+            $title = 'Editar Cadastro de modulos';
             $titulo = $title;
             $dados[0]['ac'] = 'alt';
             if(isset($dados[0]['config'])){
@@ -210,7 +210,7 @@ class CategoriasController extends Controller
             }
             $config = [
                 'ac'=>'alt',
-                'frm_id'=>'frm-categorias',
+                'frm_id'=>'frm-modulos',
                 'route'=>$this->routa,
                 'id'=>$id,
             ];
@@ -265,7 +265,7 @@ class CategoriasController extends Controller
         }
         $atualizar=false;
         if(!empty($data)){
-            $atualizar=Categoria::where('id',$id)->update($data);
+            $atualizar=Modulo::where('id',$id)->update($data);
             $route = $this->routa.'.index';
             $ret = [
                 'exec'=>$atualizar,
@@ -297,8 +297,8 @@ class CategoriasController extends Controller
         $this->authorize('delete', $this->routa);
         $config = $request->all();
         $ajax =  isset($config['ajax'])?$config['ajax']:'n';
-        $routa = 'categorias';
-        if (!$post = Categoria::find($id)){
+        $routa = 'modulos';
+        if (!$post = Modulo::find($id)){
             if($ajax=='s'){
                 $ret = response()->json(['mens'=>'Registro não encontrado!','color'=>'danger','return'=>route($this->view.'.index')]);
             }else{
@@ -307,7 +307,7 @@ class CategoriasController extends Controller
             return $ret;
         }
 
-        Categoria::where('id',$id)->delete();
+        Modulo::where('id',$id)->delete();
         if($ajax=='s'){
             $ret = response()->json(['mens'=>__('Registro '.$id.' deletado com sucesso!'),'color'=>'success','return'=>route($this->routa.'.index')]);
         }else{

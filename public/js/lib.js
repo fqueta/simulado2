@@ -969,6 +969,12 @@ function qFormCampos(config){
                     r = r.replaceAll('{op}',op);
                 }else{
                     var type = v.type;
+                    var checked = '';
+                    if(type == 'chave_checkbox'){
+                        if(v.valor_padrao==v.value){
+                            checked = 'checked';
+                        }
+                    }
                     r += tema[type].replaceAll('{type}',v.type);
                     var label = tl.replaceAll('{campo}',key);
                     label.replaceAll('{label}',);
@@ -981,6 +987,7 @@ function qFormCampos(config){
                     r = r.replaceAll('{tam}',v.tam);
                     r = r.replaceAll('{col}','md');
                     r = r.replaceAll('{class}',classe);
+                    r = r.replaceAll('{checked}',checked);
                     r = r.replaceAll('{placeholder}',v.placeholder);
                 }
             }
@@ -1075,3 +1082,4 @@ function carregaMascaraMoeda(s){
         decimal: ','
     });
 }
+function cursos_carregaUrl(){}

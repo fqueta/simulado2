@@ -126,6 +126,7 @@ class CursosController extends Controller
             ],
             'nome'=>['label'=>'Nome da Curso','active'=>true,'placeholder'=>'Ex.: Cadastrado','type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'6'],
             'valor'=>['label'=>'Valor','active'=>true,'type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'2','class'=>'moeda'],
+            //'matricula'=>['label'=>'Valor','active'=>true,'type'=>'text','exibe_busca'=>'d-block','event'=>'','tam'=>'2','class'=>'moeda'],
             'ativo'=>['label'=>'Liberar','active'=>true,'type'=>'chave_checkbox','value'=>'s','valor_padrao'=>'s','exibe_busca'=>'d-block','event'=>'','tam'=>'3','arr_opc'=>['s'=>'Sim','n'=>'Não']],
             'obs'=>['label'=>'Observação','active'=>false,'type'=>'textarea','exibe_busca'=>'d-block','event'=>'','tam'=>'12'],
         ];
@@ -274,7 +275,7 @@ class CursosController extends Controller
                     }else{
                         $data[$key] = Qlib::dtBanco($value);
                     }
-                }elseif($key == 'renda_familiar') {
+                }elseif($key == 'valor' || $key == 'matricula') {
                     $value = str_replace('R$','',$value);
                     $data[$key] = Qlib::precoBanco($value);
                 }else{

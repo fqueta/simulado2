@@ -162,7 +162,7 @@ Route::prefix('admin')->group(function(){
         'modulos' => 'id'
     ]]);
     Route::resource('provas','\App\Http\Controllers\admin\ProvasController',['parameters' => [
-        'questoes' => 'id'
+        'provas' => 'id'
     ]]);
     Route::resource('questoes','\App\Http\Controllers\admin\QuestoesController',['parameters' => [
         'questoes' => 'id'
