@@ -1,3 +1,6 @@
+const queryString = window.location.search;
+const urlParams = new URLSearchParams(queryString);
+const pop = urlParams.get('popup');
 function uniqid(prefix, more_entropy) {
   // +   original by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
   // +    revised by: Kankrelune (http://www.webfaktory.info/)
@@ -59,8 +62,9 @@ function redirect_blank(url) {
   a.click();
 }
 function encodeArray(arr){
-	var encode = JSON.stringify(btoa(arr));
-	return encode
+    var ar = JSON.stringify(arr);
+    var encode = btoa(ar);
+    return encode
 }
 function decodeArray(arr){
 	var decode = JSON.parse(atob(arr));
@@ -81,7 +85,7 @@ function abrirjanela(url, nome, w, h, param){
 		var popname = window.open(url, nome, 'width='+w+', height='+h+', scrollbars=yes, '+param);
 	else
 		var popname = window.open(url, nome, 'width='+w+', height='+h+', scrollbars=yes');
-	 popname.window.focus();
+	popname.window.focus();
 }
 function abrirjanela1(url, nome, w, h, param){
 	var largura = $( window ).width() - w;
@@ -227,7 +231,7 @@ function cancelEdit(id,ac){
 }
 function delRegistro(id){
   var don = $('#'+id+' input');
-  console.log(don);
+  //console.log(don);
   var arr = [];
   var seriali = '';
   $.each(don,function(i,k){
@@ -403,7 +407,7 @@ function alerta(msg,id,title,tam,fechar,time,fecha){
         $('#'+id).remove();
 	  var bodys = $(document.body).append(modalHtml);
 
-	  $("#"+id).modal('show');
+	  $("#"+id).modal({backdrop: 'static'});
 	if(fecha == true)
 	setTimeout(function(){$("#"+id).modal("hide")}, time);
 }
@@ -763,16 +767,21 @@ function submitFormulario(objForm,funCall,funError){
         }
     }
     var route = objForm.attr('action');
-    console.log(route);
+    //console.log(route);
     $.ajax({
         type: 'POST',
         url: route,
         data: objForm.serialize()+'&ajax=s',
         dataType: 'json',
+        beforeSend: function(){
+            $('#preload').fadeIn();
+        },
         success: function (data) {
+            $('#preload').fadeOut("fast");
             funCall(data);
         },
         error: function (data) {
+            $('#preload').fadeOut("fast");
             if(data.responseJSON.errors){
                 funError(data.responseJSON.errors);
                 console.log(data.responseJSON.errors);
@@ -801,6 +810,7 @@ function getAjax(config,funCall,funError){
     }
     if(typeof funError == 'undefined'){
         funError = function(res){
+            $('#preload').fadeOut("fast");
             lib_funError(res);
         }
     }
@@ -809,10 +819,14 @@ function getAjax(config,funCall,funError){
         url: config.url,
         data: config.data,
         dataType: 'json',
+        beforeSend: function(){
+            $('#preload').fadeIn();
+        },
         success: function (data) {
             funCall(data);
         },
         error: function (data) {
+            $('#preload').fadeOut("fast");
             if(data.errors){
                 funError(data.errors);
                 console.log(data.errors);
@@ -845,10 +859,15 @@ function submitFormularioCSRF(objForm,funCall,funError){
         url: route,
         data: objForm.serialize()+'&ajax=s',
         dataType: 'json',
+        beforeSend: function(){
+            $('#preload').fadeIn();
+        },
         success: function (data) {
+            $('#preload').fadeOut("fast");
             funCall(data);
         },
         error: function (data) {
+            $('#preload').fadeOut("fast");
             if(data.responseJSON.errors){
                 funError(data.responseJSON.errors);
                 console.log(data.responseJSON.errors);
@@ -861,7 +880,7 @@ function submitFormularioCSRF(objForm,funCall,funError){
 function lib_funError(res){
     var mens = '';
     Object.entries(res).forEach(([key, value]) => {
-        console.log(key + ' ' + value);
+        //console.log(key + ' ' + value);
         var s = $('[name="'+key+'"]');
         var v = s.val();
         mens += value+'<br>';
@@ -880,16 +899,16 @@ function lib_funError(res){
 }
 function modalGeral(id,titulo,conteudo){
     var m = $(id);
-    m.modal('show');
+    m.modal({backdrop:'static'});
     m.find('.modal-title').html(titulo);
     m.find('.conteudo').html(conteudo);
 
 }
-function initSelector(obj){
-    if(obj.val()!='cad'){
-        return
+function renderForm(config,alvo,funCall){
+    if(typeof config=='undefined'){
+        return ;
     }
-    var d = decodeArray(obj.data('selector'));
+    var d = config;
     if(d.campos){
         var f = qFormCampos(d.campos);
         if(f){
@@ -900,95 +919,184 @@ function initSelector(obj){
             tf = tf.replace('{conte}',f);
             tf = tf.replace('{action}',d.action);
             modalGeral(m,'Cadastrar '+d.label,tf);
-            //obj.find('option').attr('selected',false);
-            //obj.find('option[value=\'\']:first').attr('selected','selected');
-            obj.find('option[value=\'\']').attr('selected','selected');
             $('[f-submit]').remove();
             $(b).insertAfter(m+' .modal-footer button');
+            try {
+                $('[mask-cpf]').inputmask('999.999.999-99');
+                $('[mask-data]').inputmask('99/99/9999');
+                $('[mask-cep]').inputmask('99.999-999');
+                if(n=d.value_transport){
+                    var vl = $('[name="'+n+'"]').val();
+                    if(vl)
+                    $('[name="'+n+'"]').find('option[value='+vl+']').attr('selected','selected');
+                }
+            } catch (error) {
+                console.log(error);
+            }
+            carregaMascaraMoeda(".moeda");
+            $('#'+d.id_form+' #inp-nome').focus();
             $('[f-submit]').on('click',function(){
-
-                submitFormularioCSRF($('#'+d.id_form),function(res){
-                    if(res.mens){
-                        lib_formatMensagem('.mens',res.mens,res.color);
+                if(typeof funCall=='undefined'){
+                    funCall = function(res){
+                        if(res.mens){
+                            lib_formatMensagem('.mens',res.mens,res.color);
+                        }
+                        if(res.exec){
+                            $(m).modal('hide');
+                            alvo.append($('<option>', {
+                                value: res.idCad,
+                                text: res.dados[d.campo_bus]
+                            }));
+                            alvo.find('option[value='+res.idCad+']').attr('selected','selected').addClass('opcs');
+                        }
                     }
-                    if(res.exec){
-                        $(m).modal('hide');
-                        obj.append($('<option>', {
-                            value: res.idCad,
-                            text: res.dados[d.campo_bus]
-                        }));
-                        obj.find('option[value='+res.idCad+']').attr('selected','selected');
-                    }
-                });
+                }
+                submitFormularioCSRF($('#'+d.id_form),funCall);
             });
         }
         //$('.mens').html(campo_nome);
+    }
+}
+function initSelector(alvo,funCall){
+    if(alvo.val()=='cad'){
+        var d = decodeArray(alvo.data('selector'));
+        //console.log(alvo);
+        renderForm(d,alvo);
+        alvo.find('option[value=\'\']').attr('selected','selected');
+    }
+    if(alvo.val()=='ger'){
+        var d = decodeArray(alvo.data('selector'));
+        window.open(d.route_index,'_blank');
+        console.log(d);
+    }
+
+}
+function lib_vinculoCad(obj){
+    if(typeof obj == 'undefined'){
+        return;
+    }
+    var d = decodeArray(obj.data('selector')),ac = obj.data('ac');
+    if(ac == 'cad' && d.salvar_primeiro){
+        var msg = '<div class="row"><div id="exibe_etapas" class="col-md-12 text-center"><h6>Antes de cadastrar um parceiro é necessário salvar este cadastro!</h6></div><div class="col-md-12 mt-3 text-center"></div></div>';
+        var btns = '<button type="button" class="btn btn-primary" salvar-agora>Salvar agora</button>';
+        alerta(msg,'modal-cad-vinculo','Atenção','',true,9000,true);
+        $(btns).insertAfter('#modal-cad-vinculo .modal-footer button');
+        $('[salvar-agora]').on('click',function(){
+            $('[btn="permanecer"]').click();
+            $('#modal-cad-vinculo').modal('hide');
+        });
+        return;
+    }
+    if(typeof d.janela=='undefined'){
+        d.janela = '';
+    }
+    if(d.janela.url){
+        var url = d.janela.url+'?popup=true';
+        try {
+            if(pr=d.janela.param){
+                for (let i = 0; i < pr.length; i++) {
+                    const el = pr[i];
+                    url += '&'+el+'='+$('[name="'+el+'"]').val();
+                }
+            }
+        } catch (e) {
+            console.log(e);
+        }
+        var tag_obj = '<obj class="d-none">'+obj.data('selector')+'</obj>';
+        $('obj').remove();
+        $(tag_obj).insertBefore('body');
+        abrirjanelaPadraoConsulta(url,'vinculo');
+    }else{
+        renderForm(d,obj,function(res){
+            if(res.mens){
+                lib_formatMensagem('.mens',res.mens,res.color);
+            }
+            if(res.exec){
+                var mod = '#modal-geral';
+                $(mod).modal('hide');
+                lib_listDadosHtmlVinculo(res,obj.data('selector'),'cad');
+            }
+        });
     }
 }
 function qFormCampos(config){
     if(typeof config == 'undefined'){
         return false;
     }
-    //console.log(config);
     const tl = '<label for="{campo}">{label}</label>';
     var tema = {
         text : '<div class="form-group col-{col}-{tam} {class_div}" div-id="{campo}" >{label}<input type="{type}" class="form-control {class}" id="inp-{campo}" name="{campo}" aria-describedby="{campo}" placeholder="{placeholder}" value="{value}" {event} /></div>',
+        tel : '<div class="form-group col-{col}-{tam} {class_div}" div-id="{campo}" >{label}<input type="{type}" class="form-control {class}" id="inp-{campo}" name="{campo}" aria-describedby="{campo}" placeholder="{placeholder}" value="{value}" {event} /></div>',
+        date : '<div class="form-group col-{col}-{tam} {class_div}" div-id="{campo}" >{label}<input type="{type}" class="form-control {class}" id="inp-{campo}" name="{campo}" aria-describedby="{campo}" placeholder="{placeholder}" value="{value}" {event} /></div>',
         number : '<div class="form-group col-{col}-{tam} {class_div}" div-id="{campo}" >{label}<input type="{type}" class="form-control {class}" id="inp-{campo}" name="{campo}" aria-describedby="{campo}" placeholder="{placeholder}" value="{value}" {event} /></div>',
         hidden : '<div class="form-group col-{col}-{tam} {class_div} d-none" div-id="{campo}" >{label}<input type="{type}" class="form-control {class}" id="inp-{campo}" name="{campo}" aria-describedby="{campo}" placeholder="{placeholder}" value="{value}" {event} /></div>',
+        textarea : '<div class="form-group col-{col}-{tam} {class_div}" div-id="{campo}" ><textarea name="{campo}" class="form-control {class}" rows="{rows}" cols="{cols}">{value}</textarea></div>',
         chave_checkbox : '<div class="form-group col-{col}-{tam}"><div class="custom-control custom-switch  {class}"><input type="checkbox" class="custom-control-input" {checked} value="{value}"  name="{campo}" id="{campo}"><label class="custom-control-label" for="{campo}">{label}</label></div></div>',
         select : {
             tm1 : '<div class="form-group col-{col}-{tam} {class_div}" div-id="{campo}" >{label}<select name="{campo}" {event} class="form-control custom-select {class}">{op}</select></div>',
-            tm2 : '<option value="{k}" {selected}>{v}</option>'
+            tm2 : '<option value="{k}" class="opcs" {selected}>{v}</option>'
         }
     };
     var r = '';
     var ret = '';
     if(Object.entries(config).length>0){
         Object.entries(config).forEach(([key, v]) => {
-            if(v.type!='hidder' && v.active==true){
+            if(v.js || v.active){
                 if(v.type == 'selector' || v.type == 'select'){
                     let op='',arr = v.arr_opc,tm1 = tema['select'].tm1,tm2 = tema['select'].tm2;
-                    //console.log(arr);return;
+                    var value = v.value?v.value:'';
                     Object.entries(arr).forEach(([i, el]) => {
                         op += tm2.replace('{k}',i);
+                        var selected = '';
+                        if(value==i){
+                            var selected = 'selected';
+                        }
+                        op = op.replaceAll('{selected}',selected);
                         op = op.replace('{v}',el);
                     });
                     var type = v.type;
                     r += tm1.replaceAll('{type}',v.type);
                     var label = tl.replaceAll('{campo}',key);
                     label.replaceAll('{label}',);
-                    var value = v.value?v.value:'';
                     var classe = v.class?v.class:'';
                     var placeholder = v.placeholder?v.placeholder:'';
                     r = r.replaceAll('{campo}',key);
                     r = r.replaceAll('{label}',v.label);
                     r = r.replaceAll('{value}',value);
                     r = r.replaceAll('{tam}',v.tam);
+                    r = r.replaceAll('{event}',v.event);
                     r = r.replaceAll('{col}','md');
                     r = r.replaceAll('{class}',classe);
                     r = r.replaceAll('{op}',op);
+                    r = r.replaceAll('{placeholder}',placeholder);
                 }else{
-                    var type = v.type;
-                    var checked = '';
-                    if(type == 'chave_checkbox'){
-                        if(v.valor_padrao==v.value){
-                            checked = 'checked';
+                    try {
+
+                        var type = v.type;
+                        var checked = '';
+                        if(type == 'chave_checkbox'){
+                            if(v.valor_padrao==v.value){
+                                checked = 'checked';
+                            }
                         }
+                        r += tema[type].replaceAll('{type}',v.type);
+                        var label = tl.replaceAll('{campo}',key);
+                        label.replaceAll('{label}',);
+                        var value = v.value?v.value:'';
+                        var classe = v.class?v.class:'';
+                        var placeholder = v.placeholder?v.placeholder:'';
+                        r = r.replaceAll('{campo}',key);
+                        r = r.replaceAll('{label}',v.label);
+                        r = r.replaceAll('{value}',value);
+                        r = r.replaceAll('{tam}',v.tam);
+                        r = r.replaceAll('{event}',v.event);
+                        r = r.replaceAll('{col}','md');
+                        r = r.replaceAll('{class}',classe);
+                        r = r.replaceAll('{checked}',checked);
+                        r = r.replaceAll('{placeholder}',placeholder);
+                    } catch (e) {
+                        console.log(e);
                     }
-                    r += tema[type].replaceAll('{type}',v.type);
-                    var label = tl.replaceAll('{campo}',key);
-                    label.replaceAll('{label}',);
-                    var value = v.value?v.value:'';
-                    var classe = v.class?v.class:'';
-                    var placeholder = v.placeholder?v.placeholder:'';
-                    r = r.replaceAll('{campo}',key);
-                    r = r.replaceAll('{label}',v.label);
-                    r = r.replaceAll('{value}',value);
-                    r = r.replaceAll('{tam}',v.tam);
-                    r = r.replaceAll('{col}','md');
-                    r = r.replaceAll('{class}',classe);
-                    r = r.replaceAll('{checked}',checked);
-                    r = r.replaceAll('{placeholder}',v.placeholder);
                 }
             }
         });
@@ -1059,6 +1167,10 @@ function janelaEtapaMass(selecionandos){
                 et += '<input type="hidden" name="ids" value="'+selecionandos+'"/>';
                 $('#exibe_etapas').html(et);
                 $(btnsub).insertAfter('#'+m+' .modal-footer button');
+                $('[mask-cpf]').inputmask('999.999.999-99');
+                $('[mask-data]').inputmask('99/99/9999');
+                $('[mask-cep]').inputmask('99.999-999');
+                carregaMascaraMoeda(".moeda");
                 $('#submit-frm-etapas').on('click',function(e){
                     e.preventDefault();
                     submitFormularioCSRF($('#frm-etapas'),function(res){
@@ -1082,4 +1194,619 @@ function carregaMascaraMoeda(s){
         decimal: ','
     });
 }
+function lib_carregaConjuge(frmParce,frmBene){
+    var formParce = $(frmParce);
+    var formBenef = $(frmBene);
+    var idBenef = formBenef.find('[name="id"]').val();
+    formParce.find('[name="conjuge"]').val(idBenef);
+}
 function cursos_carregaUrl(){}
+function lib_htmlVinculo(ac,campos,lin){
+    var c = decodeArray(campos),idf='#'+c.id_form,arr=c.campos;
+    try {
+        if(typeof lin == 'undefined'){
+            lin = '';
+        }
+        var tipo=c.tipo;
+    } catch (e) {
+        var tipo='int';
+        console.log(e);
+    }
+    if(typeof tipo =='undefined'){
+        var tipo='int';
+    }
+    if(ac=='del'){
+        if(tipo=='array' && lin){
+            var id = c.list[lin].id,trsel = '#tr-'+lin+'-'+id;
+        }else{
+            var id = c.list.id,trsel = '#tr-'+id;
+        }
+        if(id){
+            var msg = '<div class="row"><div id="mens-id" class="col-md-12 text-center"><h5>Deseja Remover da lista?</h5><p>Para completar é necessário salvar</p><p>Remover da lista não exclui o cadastro</p></div><div class="col-md-12 mt-3 text-center"></div></div>';
+            var btnr = '<button type="button" class="btn btn-danger" deletar>Remover Agora!</button>';
+            alerta(msg,'modal-del-html_vinculo','Atenção','',true);
+            $(btnr).insertAfter('#modal-del-html_vinculo .modal-footer button');
+            $('[deletar]').on('click',function(){
+                if(tipo=='array' && lin){
+                    $('#table-html_vinculo-'+c.campo+' '+trsel).remove();
+                }else{
+                    $('#table-html_vinculo-'+c.campo+' '+trsel+' td').html('');
+                }
+                $('#modal-del-html_vinculo').modal('hide');
+                $('[name="'+c.campo+'"]').val('');
+            });
+        }
+    }
+    if(ac=='alt'){
+        if(Object.entries(arr).length>0){
+            Object.entries(arr).forEach(([k, v]) => {
+                if(tipo=='array'){
+                    var l = '';
+                    try {
+                        var list = $('#tr-'+lin+'-')
+                        if(l = c.list[lin][k]){
+                            c.campos[k].value = l;
+                        }else{
+                            if(cp=c.campos[k].cp_busca){
+                                let ar = cp.split('][');
+                                if(ar[1]){
+                                    try {
+                                        c.campos[k].value = c.list[lin][ar[0]][ar[1]];
+                                    } catch (error) {
+                                        console.log(error);
+                                    }
+                                }
+                            }
+                        }
+                        console.log(c);
+                    } catch (error) {
+                        console.log(error);
+                    }
+                }else{
+                    if(c.list[k]){
+                        c.campos[k].value = c.list[k];
+                    }else{
+                        if(cp=c.campos[k].cp_busca){
+                            let ar = cp.split('][');
+                            if(ar[1]){
+                                try {
+                                    c.campos[k].value = c.list[ar[0]][ar[1]];
+                                } catch (error) {
+                                    console.log(error);
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            renderForm(c,campos,function(res){
+                if(res.mens){
+                    lib_formatMensagem('.mens',res.mens,res.color);
+                }
+                if(res.exec){
+                    var mod = '#modal-geral';
+                    $(mod).modal('hide');
+                    lib_listDadosHtmlVinculo(res,campos,ac,lin);
+                }
+            });
+            if(tipo=='array' && lin){
+                try {
+                    var tid='';
+                    if(c.list[lin].id){
+                        tid=c.list[lin].id;
+                    }else if(c.list.id){
+                        tid=c.list.id;
+                    }
+                    frm = $(idf)
+                    var m = '<input type="hidden" name="_method" value="PUT">';
+                    frm.attr('action',c.action+'/'+c.tid);
+                    frm.find('[name="_method"]').remove();
+                    frm.append(m);
+
+                } catch (error) {
+                    console.log(error);
+                }
+            }else{
+                if(c.list.id){
+                    frm = $(idf)
+                    var m = '<input type="hidden" name="_method" value="PUT">';
+                    frm.attr('action',c.action+'/'+c.list.id);
+                    frm.find('[name="_method"]').remove();
+                    frm.append(m);
+                }
+            }
+        }
+    }
+}
+function lib_htmlVinculo2(ac,campos,id,lin){
+    var c = decodeArray(campos),idf='#'+c.id_form,arr=c.campos;
+    try {
+        if(typeof lin == 'undefined'){
+            lin='';
+        }
+        if(typeof id == 'undefined'){
+            return 'dados lista indefinida';
+        }
+        var seleinp = '#inp-list-'+lin+'-'+id;
+        var inpli = $(seleinp).val();
+        var dl = decodeArray(inpli);
+        var tipo=c.tipo;
+    } catch (e) {
+        var tipo='int';
+        console.log(e);
+    }
+    if(typeof tipo =='undefined'){
+        var tipo='int';
+    }
+    if(ac=='del'){
+        if(tipo=='array' && lin){
+            var id = id,trsel = '#tr-'+lin+'-'+id;
+        }else{
+            var id = c.list.id,trsel = '#tr-'+id;
+        }
+        if(id){
+            var msg = '<div class="row"><div id="mens-id" class="col-md-12 text-center"><h5>Deseja Remover da lista?</h5><p>Para completar é necessário salvar</p><p>Remover da lista não exclui o cadastro</p></div><div class="col-md-12 mt-3 text-center"></div></div>';
+            var btnr = '<button type="button" class="btn btn-danger" deletar>Remover Agora!</button>';
+            alerta(msg,'modal-del-html_vinculo','Atenção','',true);
+            $(btnr).insertAfter('#modal-del-html_vinculo .modal-footer button');
+            $('[deletar]').on('click',function(){
+                if(tipo=='array' && lin){
+                    $('#table-html_vinculo-'+c.campo+' '+trsel).remove();
+                }else{
+                    $('#table-html_vinculo-'+c.campo+' '+trsel+' td').html('');
+                }
+                $('#modal-del-html_vinculo').modal('hide');
+                $('[name="'+c.campo+'"]').val('');
+            });
+        }
+    }
+    if(ac=='alt'){
+        if(Object.entries(arr).length>0){
+            Object.entries(arr).forEach(([k, v]) => {
+                if(tipo=='array'){
+                    var l = '';
+                    try {
+                        if(l = dl[k]){
+                            c.campos[k].value = l;
+                        }else{
+                            if(cp=c.campos[k].cp_busca){
+                                let ar = cp.split('][');
+                                if(ar[1]){
+                                    try {
+                                        c.campos[k].value = dl[ar[0]][ar[1]];
+                                    } catch (error) {
+                                        console.log(error);
+                                    }
+                                }
+                            }
+                        }
+                    } catch (error) {
+                        console.log(error);
+                    }
+                }else{
+                    if(c.list[k]){
+                        c.campos[k].value = c.list[k];
+                    }else{
+                        if(cp=c.campos[k].cp_busca){
+                            let ar = cp.split('][');
+                            if(ar[1]){
+                                try {
+                                    c.campos[k].value = c.list[ar[0]][ar[1]];
+                                } catch (error) {
+                                    console.log(error);
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            renderForm(c,campos,function(res){
+                if(res.mens){
+                    lib_formatMensagem('.mens',res.mens,res.color);
+                }
+                if(res.exec){
+                    var mod = '#modal-geral';
+                    $(mod).modal('hide');
+                    lib_listDadosHtmlVinculo(res,campos,ac,lin);
+                }
+            });
+            if(tipo=='array' && dl){
+                try {
+                    /*
+                    var tid='';
+                    if(dl[id]){
+                        tid=dl[id];
+                    }
+                    console.log(dl);
+                    */
+                    frm = $(idf)
+                    var m = '<input type="hidden" name="_method" value="PUT">';
+                    frm.attr('action',c.action+'/'+dl['id']);
+                    frm.find('[name="_method"]').remove();
+                    frm.append(m);
+
+                } catch (error) {
+                    console.log(error);
+                }
+            }else{
+                if(c.list.id){
+                    frm = $(idf)
+                    var m = '<input type="hidden" name="_method" value="PUT">';
+                    frm.attr('action',c.action+'/'+c.list.id);
+                    frm.find('[name="_method"]').remove();
+                    frm.append(m);
+                }
+            }
+        }
+    }
+}
+function calculaLinCad(seleTr){
+    //calcula numero da ultima linha
+    var ret='';
+    try {
+        var elem = $(seleTr).last().attr('id');
+        if(typeof elem=='undefined'){
+            return '0';
+        }
+        var tr=elem.split('-');
+        if(tr[1]){
+            ret = new Number(tr[1])+1;
+        }
+    } catch (e) {
+        console.log(e);
+        return '0';
+    }
+    return ret;
+
+}
+function lib_listDadosHtmlVinculo(res,campos,ac,lin){
+    //lin é o numero da linha para o caso do tipo array
+    //alert(lin);
+    if(typeof ac=='undefined'){
+        ac = 'alt';
+    }
+    if(typeof lin=='undefined'){
+        lin = '';
+    }
+    var dt = decodeArray(campos);
+    try {
+        var tipo=dt.tipo;
+    } catch (e) {
+        var tipo='int';
+        console.log(e);
+    }
+    if(typeof tipo =='undefined'){
+        var tipo='int';
+    }
+    if((d=res.dados) && ac =='cad'){
+        var table = $('#table-html_vinculo-'+dt.campo);
+        lin = calculaLinCad('#table-html_vinculo-'+dt.campo+' tbody tr');
+       // alert(lin);
+        var tm = $('tm').html();
+        var tm0 = '<tr id="tr-{id}">{td}</tr>';
+        var tm = '<td id="td-{k}" class="{class}">{v}</td>';
+        var data_list = encodeArray(d);
+        if(t = dt.table){
+            var td = '';
+            $.each(t,function(k,v){
+                if(v.type=='text'){
+                    td += tm.replaceAll('{k}',k);
+                    td = td.replaceAll('{v}',d[k]);
+                    td = td.replaceAll('{class}','');
+                }else if(v.type=='arr_tab'){
+                    var kv = k+'_valor';
+                    td += tm.replaceAll('{k}',kv);
+                    td = td.replaceAll('{v}',d[kv]);
+                    td = td.replaceAll('{class}','');
+                }
+            });
+            if (tipo=='array'&&lin){
+                if(lin=='0')
+                    lin=0;
+                /*try {
+
+                    if(typeof dt.list[lin]=='undefined'){
+                        dt.list = [d];
+                    }else{
+                        dt.list[lin] = d;
+                    }
+                    console.log(dt);
+                } catch (e) {
+                    dt.list = [d];
+                    console.log(e);
+                }*/
+            }else{
+                dt.list = d;
+            }
+            var e = encodeArray(dt);
+            var btnsAc = '<button type="button" btn-alt="" onclick="lib_htmlVinculo2(\'alt\',\''+e+'\',\''+d['id']+'\',\''+lin+'\')" title="Editar" class="btn btn-outline-secondary"><i class="fas fa-pencil-alt"></i> </button> '+
+            '<button type="button" onclick="lib_htmlVinculo2(\'del\',\''+e+'\',\''+d['id']+'\',\''+lin+'\')" class="btn btn-outline-danger" title="Remover"> <i class="fa fa-trash" aria-hidden="true"></i> </button>';
+            var tdacao = tm.replaceAll('{k}','tr-acao');
+            tdacao = tdacao.replaceAll('{v}',btnsAc);
+            tdacao = tdacao.replaceAll('{class}','text-right');
+            if(tipo=='array'){
+                var tr = tm0.replaceAll('{id}',lin+'-'+d.id);
+                var inp = '<input type="hidden" name="'+dt.campo+'[]" value="'+d.id+'" />'+
+                '<input type="hidden" value="'+data_list+'" id="inp-list-'+lin+'-'+d.id+'">';
+                var tr = tr.replaceAll('{td}',td+inp+tdacao);
+                //var tr = tr.replaceAll('{data_list}',data_list);
+                table.find('tbody').append(tr);
+            }else{
+                var tr = tm0.replaceAll('{id}',d.id);
+                var tr = tr.replaceAll('{td}',td+tdacao);
+                var inp = '<input type="hidden" name="'+dt.campo+'" value="'+d.id+'" />';
+                var tr = tr.replaceAll('{data_list}',data_list);
+                table.find('tbody tr').remove();
+                table.find('tbody').html(tr);
+                if(dt.campo){
+                    $('[name="'+dt.campo+'"]').remove();
+                    var selInp = table.find('tbody');
+                    $(inp).insertBefore(selInp);
+                }
+            }
+        }
+    }
+    if((d=res.dados) && ac =='alt'){
+        var table = $('#table-html_vinculo-'+dt.campo);
+        if(tipo=='array' && lin){
+            var seltr = '#tr-'+lin+'-'+d.id;
+            //dt.list = d;
+            //console.log(dt.list[lin]);
+        }else{
+            var seltr = '#tr-'+d.id;
+            dt.list = d;
+        }
+        $.each(d,function(k,v){
+            table.find(seltr+' #td-'+k).html(v);
+        });
+        var e = encodeArray(dt);
+
+        table.find(seltr+' [btn-alt]').attr('data_selector',e);
+        table.find(seltr+' #inp-list-'+lin+'-'+d.id).val(encodeArray(d));
+
+        //table.find(seltr+' [btn-alt]').attr('onclick','lib_htmlVinculo(\'alt\',"'+e+'","'+lin+'")');
+        table.find(seltr+' [btn-alt]').attr('onclick','lib_htmlVinculo2(\'alt\',"'+e+'","'+d.id+'","'+lin+'")');
+        //console.log(dt);
+        //alert(ac);
+    }
+}
+function lib_listarCadastro(res,obj){
+    if(typeof obj == 'undefined')
+    {
+        return;
+    }
+    try {
+        if(res.id=='cad'){
+            var dt = decodeArray(obj.data('selector'));
+            $('[div-id="'+dt.campo+'"] [data-ac="cad"]').click();
+            //console.log(dt);
+            return;
+        }
+        if(res.dados){
+            lib_listDadosHtmlVinculo(res,obj.data('selector'),'cad');
+            obj.val('');
+        }
+    } catch (error) {
+        console.log(error);
+    }
+}
+function lib_abrirModalConsultaVinculo(campo,ac){
+
+    var btnAbrir = $('#row-'+campo+' .btn-consulta-vinculo'),btnFechar = $('#row-'+campo+' .btn-voltar-vinculo'),ef='slow';
+    if(ac=='abrir'){
+        btnAbrir.hide(ef);
+        btnFechar.show(ef);
+        $('#inp-cad-'+campo).show(ef);
+        $('#inp-cad-'+campo+' input').val('');
+        $('#inp-cad-'+campo+' input').focus();
+        lib_autocomplete($('#inp-auto-'+campo));
+    }
+    if(ac=='fechar'){
+        btnAbrir.show(ef);
+        btnFechar.hide(ef);
+        $('#inp-cad-'+campo).hide(ef);
+        $('#inp-cad-'+campo+' input').val('');
+    }
+}
+function lib_autocomplete(obs){
+    var urlAuto = obs.attr('url');
+    var data_selector = obs.data('selector'),d=decodeArray(data_selector);
+    try {
+        if(typeof d.janela != 'undefined'){
+            if(pr=d.janela.param){
+                //console.log(d.janela.param);
+                for (let i = 0; i < pr.length; i++) {
+                    const el = pr[i];
+                    if(i==0){
+                        urlAuto += '?'+el+'='+$('[name="'+el+'"]').val();
+                    }else{
+                        urlAuto += '&'+el+'='+$('[name="'+el+'"]').val();
+                    }
+                }
+            }
+        }
+    }
+    catch (e) {
+        console.log(e);
+    }
+    //console.log(urlAuto);
+     obs.autocomplete({
+        source: urlAuto,
+        search  : function(){$(this).addClass('ui-autocomplete-loading');},
+        open    : function(){$(this).removeClass('ui-autocomplete-loading');},
+        select: function (event, ui) {
+            lib_listarCadastro(ui.item,$(this));
+        },
+    });
+}
+function carregaMatricula(val,local){
+    if(typeof local=='undefined'){
+        local='';
+    }
+    if(val==''|| val=='cad'|| val=='ger' || !val)
+        return ;
+    if(local=='familias'){
+        carregaQuadras(val);
+        lib_abrirModalConsultaVinculo('loteamento','fechar');
+    }
+    getAjax({
+        url:'/bairros/'+val+'/edit?ajax=s',
+    },function(res){
+        $('#preload').fadeOut("fast");
+        if(m=res.value.matricula){
+            $('[name="matricula"]').val(m);
+            $('#txt-matricula').html(m);
+        }else{
+            $('[name="matricula"]').val('');
+            $('#txt-matricula').html('');
+        }
+    });
+}
+function carregaBairro(val){
+    if(val==''|| val=='cad'|| val=='ger' || !val)
+        return ;
+    getAjax({
+        url:'/quadras/'+val+'/edit?ajax=s',
+    },function(res){
+        $('#preload').fadeOut("fast");
+        try {
+            if(b=res.value.bairro){
+
+                $('[name="bairro"]').val(b);
+                $('#txt-bairro').html(res.value.bairro_nome);
+            }else{
+                $('[name="bairro"]').val('');
+                $('#txt-bairro').html('');
+            }
+        } catch (error) {
+            console.log(error);
+        }
+
+    });
+}
+function carregaQuadras(val,selQuadra){
+    if(typeof selQuadra=='undefined'){
+        selQuadra='quadra';
+    }
+    if(val==''){
+        $('[div-id="'+selQuadra+'"] option.opcs').each(function(){
+            $(this).remove();
+        });
+        return
+    }
+    getAjax({
+        url:'/quadras?ajax=s&filter[bairro]='+val+'&campo_order=id&order=ASC',
+    },function(res){
+        $('#preload').fadeOut("fast");
+        var option_select = '<option value="{value}" class="opcs">{label}</option>';
+        var opc = '';
+        $('[div-id="'+selQuadra+'"] option.opcs').each(function(v,k){
+            $(this).remove();
+        });
+        if(d=res.dados.data){
+            $.each(d,function(k,v){
+                //console.log(v);
+                opc += option_select.replaceAll('{label}',v.nome);
+                opc = opc.replaceAll('{value}',v.id);
+            });
+            //$(opc).insertAfter('[div-id="'+selQuadra+'"] option[disabled]');
+            $(opc).insertAfter('[div-id="'+selQuadra+'"] option.option_select');
+
+            //$(selector).insertAfter('[div-id="bairro"]');
+        }
+    });
+    $.ajax({
+        url:'/quadras?ajax=s&filter[bairro]=1',
+        type:'GET',
+        success:'GET',
+    });
+}
+function buscaCep1_0(cep_code){
+    if( cep_code.length <= 0 ) return;
+    cep_code = cep_code.replaceAll('.','').replaceAll('-','');
+    $.get("https://viacep.com.br/ws/"+cep_code+"/json/", { code: cep_code },
+       function(result){
+           console.log(result);
+          if( result.cep =='' ){
+             alerta(result.message || "Cep nÃ£o encontrado!");
+             return;
+          }
+          if( result.erro){
+              $('#Cep,#Cep,[q-inp="Cep"],[name="edit_cliente[Cep]"]').select();
+             lib_formatMensagem('.mens,.mensa',"O cep <b>"+cep_code+"</b> nÃ£o foi encontrado! <button type=\"button\" onclick='abrirjanelaPadraoConsulta(\"https://buscacepinter.correios.com.br/app/endereco/index.php?t\");' class='btn btn-primary'>"+__translate('NÃ£o sei o cep')+"</button>",'danger',9000);
+              $('input#Cep,[name="cep"],[q-inp="cep"],[name="edit_cliente[Cep]"]').val('');
+             return;
+          }
+          //$("input#Cep,[name=\"cep\"],[q-inp=\"cep\"]").val( result.cep );
+          $('input#Estado,[name="uf"],[q-inp="uf"],[uf="cep"],[name="edit_cliente[Uf]"]').val( result.uf );
+          $('input#Cidade,[name="cidade"],[q-inp="cidade"],[cidade="cep"],[name="edit_cliente[Cidade]"]').val( result.localidade );
+          $('input#Bairro,[name="bairro"],[q-inp="bairro"],[bairro="cep"],[name="edit_cliente[Bairro]"]').val( result.bairro );
+          $('input#Endereco,[name="endereco"],[q-inp="endereco"],[endereco="cep"],[name="edit_cliente[Endereco]"]').val( result.logradouro );
+          $('#UF,[name="Uf"],[name="config[uf]"]').val( result.uf );
+          $("#Uf").val( result.uf );
+          $('#codigoCidade,[name="config_notas[endereco][codigoCidade]"],[codigoCidade="cep"],[name="config[codigoCidade]"],[name="edit_cliente[codigoCidade]"]').val(result.ibge);
+          $('#numero,#Numero,[q-inp="numero"],[name="numero"],[numero="cep"]').select();
+       });
+}
+function popupCallback_vinculo(res){
+    var obj = $('obj').html();
+    var d = decodeArray(obj);
+    //console.log(d);
+    if(res.mens){
+        lib_formatMensagem('.mens',res.mens,res.color);
+    }
+    if(res.exec){
+        lib_listDadosHtmlVinculo(res,obj,'cad');
+    }
+}
+function popupCallback_redirect(url){
+    window.location=url;
+}
+function btVoltar(obj){
+    var href = obj.attr('href'),redirect = obj.attr('redirect');
+    if(redirect){
+        if(pop){
+            if(redirect){
+                popupCallback_redirect(redirect);
+                window.close();
+            }
+        }else{
+            window.location = redirect;
+        }
+    }else{
+        if(pop){
+            window.close();
+
+        }else{
+            window.location = href;
+        }
+    }
+}
+function lib_abrirListaOcupantes(){
+    var sel = coleta_checked($('.table .checkbox:checked'));
+    if(sel==''){
+        var msg = '<div class="row"><div id="exibe_etapas" class="col-md-12 text-center"><p>Por favor selecione um registro!</p></div></div>';
+        alerta(msg,'modal-etapa','Alerta','',true,3000,true)
+        return;
+    }else{
+        var url = '/lotes/lista-ocupantes/'+sel;
+        abrirjanelaPadraoConsulta(url,'lista-ocupantes');
+    }
+}
+function sendFile(file,editor,welEditable) {
+    data = new FormData();
+    data.append("file", file);
+    $.ajax({
+        data: data,
+        type: "POST",
+        url: "url/para/upload/",
+        cache: false,
+        contentType: false,
+        processData: false,
+        success: function(url) {
+            editor.insertImage(welEditable, url);
+        }
+    });
+}

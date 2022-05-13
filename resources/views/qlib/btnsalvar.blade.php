@@ -17,18 +17,11 @@
             @endcan
         @else
             @can('create',$config['route'])
+                @if (!isset($_GET['popup']))
+
                 <button type="submit" btn="permanecer" class="btn btn-primary">Salvar e permanecer</button>
+                @endif
                 <button type="submit" btn="sair"  class="btn btn-outline-primary">Salvar e Sair <i class="fa fa-chevron-right"></i></button>
             @endcan
         @endif
 </div>
-<script>
-    function btVoltar(obj){
-        var href = obj.attr('href'),redirect = obj.attr('redirect');
-        if(redirect){
-            window.location = redirect;
-        }else{
-            window.location = href;
-        }
-    }
-</script>

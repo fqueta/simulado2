@@ -3,7 +3,7 @@
 <div class="col-md-12">
     <div class="card">
         <div class="card-header">
-            <h5 class="card-title">Pesquisar cadastros</h5>
+            <h5 class="card-title">{{__('Pesquisar cadastros')}}</h5>
             <div class="card-tools">
                 <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
                   <i class="fas fa-minus"></i>
